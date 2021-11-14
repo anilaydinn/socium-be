@@ -5,12 +5,23 @@ import (
 	"log"
 	"time"
 
+	"github.com/anilaydinn/socium-be/errors"
+	"github.com/anilaydinn/socium-be/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Repository struct {
 	mongoClient *mongo.Client
+}
+
+type UserEntity struct {
+	ID       string `bson:"id"`
+	Name     string `bson:"name"`
+	Surname  string `bson:"surname"`
+	Email    string `bson:"email"`
+	Password string `bson:"password"`
 }
 
 func NewRepository(uri string) *Repository {
@@ -25,5 +36,69 @@ func NewRepository(uri string) *Repository {
 	}
 
 	return &Repository{client}
+}
 
+func (repository *Repository) RegisterUser(user model.User) (*model.User, error) {
+	collection := repository.mongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	userEntity := convertUserModelToUserEntity(user)
+
+	_, err := collection.InsertOne(ctx, userEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.GetUser(userEntity.ID)
+}
+
+func (repository *Repository) GetUser(userID string) (*model.User, error) {
+	collection := repository.mongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": userID}
+
+	cur := collection.FindOne(ctx, filter)
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if cur == nil {
+		return nil, errors.UserNotFound
+	}
+
+	userEntity := UserEntity{}
+	err := cur.Decode(&userEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user := convertUserEntityToUserModel(userEntity)
+
+	return &user, nil
+}
+
+func convertUserModelToUserEntity(user model.User) UserEntity {
+	return UserEntity{
+		ID:       user.ID,
+		Name:     user.Name,
+		Surname:  user.Surname,
+		Email:    user.Email,
+		Password: user.Password,
+	}
+}
+
+func convertUserEntityToUserModel(userEntity UserEntity) model.User {
+	return model.User{
+		ID:       userEntity.ID,
+		Name:     userEntity.Name,
+		Surname:  userEntity.Surname,
+		Email:    userEntity.Email,
+		Password: userEntity.Password,
+	}
 }

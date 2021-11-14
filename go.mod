@@ -4,15 +4,28 @@ go 1.17
 
 require (
 	github.com/gofiber/fiber/v2 v2.21.0
+	github.com/smartystreets/goconvey v1.7.2
 	go.mongodb.org/mongo-driver v1.7.4
+)
+
+require (
+	github.com/gofiber/utils v0.0.10 // indirect
+	github.com/gorilla/schema v1.1.0 // indirect
+	github.com/mattn/go-colorable v0.1.7 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/gofiber/fiber v1.14.6
 	github.com/golang/snappy v0.0.3 // indirect
+	github.com/google/uuid v1.3.0
+	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
+	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/smartystreets/assertions v1.2.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.31.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

@@ -4,7 +4,6 @@ import (
 	"github.com/anilaydinn/socium-be/controller"
 	"github.com/anilaydinn/socium-be/repository"
 	"github.com/anilaydinn/socium-be/service"
-	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -12,14 +11,7 @@ func main() {
 	service := service.NewService(repository)
 	api := controller.NewAPI(&service)
 
-	app := SetupApp(&api)
+	app := controller.Handler(&api)
 
 	app.Listen(":8080")
-}
-
-func SetupApp(api *controller.API) *fiber.App {
-
-	app := fiber.New()
-
-	return app
 }
