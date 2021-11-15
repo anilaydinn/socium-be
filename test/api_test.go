@@ -2,11 +2,13 @@ package test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/anilaydinn/socium-be/controller"
 	"github.com/anilaydinn/socium-be/model"
@@ -18,7 +20,7 @@ import (
 
 func TestRegisterUser(t *testing.T) {
 	Convey("Given a valid user data", t, func() {
-		testRepository := repository.NewRepository("mongodb://localhost:27017")
+		testRepository := GetCleanTestRepository()
 		service := service.NewService(testRepository)
 		api := controller.NewAPI(&service)
 
@@ -59,4 +61,15 @@ func TestRegisterUser(t *testing.T) {
 			})
 		})
 	})
+}
+
+func GetCleanTestRepository() *repository.Repository {
+	repository := repository.NewRepository("mongodb://localhost:27017")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	testDB := repository.MongoClient.Database("socium")
+	testDB.Drop(ctx)
+
+	return repository
 }

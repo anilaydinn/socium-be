@@ -13,7 +13,7 @@ import (
 )
 
 type Repository struct {
-	mongoClient *mongo.Client
+	MongoClient *mongo.Client
 }
 
 type UserEntity struct {
@@ -39,7 +39,7 @@ func NewRepository(uri string) *Repository {
 }
 
 func (repository *Repository) RegisterUser(user model.User) (*model.User, error) {
-	collection := repository.mongoClient.Database("socium").Collection("users")
+	collection := repository.MongoClient.Database("socium").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -55,7 +55,7 @@ func (repository *Repository) RegisterUser(user model.User) (*model.User, error)
 }
 
 func (repository *Repository) GetUser(userID string) (*model.User, error) {
-	collection := repository.mongoClient.Database("socium").Collection("users")
+	collection := repository.MongoClient.Database("socium").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
