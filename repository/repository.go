@@ -83,6 +83,35 @@ func (repository *Repository) GetUser(userID string) (*model.User, error) {
 	return &user, nil
 }
 
+func (repository *Repository) GetUserByEmail(email string) (*model.User, error) {
+	collection := repository.MongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"email": email}
+
+	cur := collection.FindOne(ctx, filter)
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if cur == nil {
+		return nil, errors.UserNotFound
+	}
+
+	userEntity := UserEntity{}
+	err := cur.Decode(&userEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user := convertUserEntityToUserModel(userEntity)
+
+	return &user, nil
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:       user.ID,

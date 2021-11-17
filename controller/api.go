@@ -15,6 +15,7 @@ func Handler(api *API) *fiber.App {
 	app := fiber.New()
 
 	app.Post("/users", api.RegisterUserHandler)
+	app.Post("/users/login", api.LoginUserHandler)
 
 	return app
 }
@@ -40,6 +41,27 @@ func (api *API) RegisterUserHandler(c *fiber.Ctx) {
 	case nil:
 		c.JSON(user)
 		c.Status(fiber.StatusCreated)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+}
+
+func (api *API) LoginUserHandler(c *fiber.Ctx) {
+	userCredentialsDTO := model.UserCredentialsDTO{}
+
+	err := c.BodyParser(&userCredentialsDTO)
+
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+	}
+
+	token, cookie, err := api.service.LoginUser(userCredentialsDTO)
+
+	switch err {
+	case nil:
+		c.JSON(token)
+		c.Cookie(cookie)
+		c.Status(fiber.StatusOK)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}
