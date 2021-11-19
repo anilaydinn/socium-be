@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/anilaydinn/socium-be/errors"
 	"github.com/anilaydinn/socium-be/model"
 	"github.com/anilaydinn/socium-be/service"
 	"github.com/gofiber/fiber"
@@ -62,6 +63,8 @@ func (api *API) LoginUserHandler(c *fiber.Ctx) {
 		c.JSON(token)
 		c.Cookie(cookie)
 		c.Status(fiber.StatusOK)
+	case errors.UserNotFound:
+		c.Status(fiber.StatusBadRequest)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

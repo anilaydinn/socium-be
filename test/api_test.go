@@ -112,6 +112,27 @@ func TestLoginUser(t *testing.T) {
 				So(len(actualResult.Token), ShouldBeGreaterThan, 0)
 			})
 		})
+
+		Convey("When invalid user request sent", func() {
+			userCredentialsDTO := model.UserCredentialsDTO{
+				Email:    "wrongmail@gmail.com",
+				Password: "wrongpassword",
+			}
+
+			reqBody, err := json.Marshal(userCredentialsDTO)
+			So(err, ShouldBeNil)
+
+			req, _ := http.NewRequest("POST", "/users/login", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 400", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusBadRequest)
+			})
+		})
 	})
 }
 

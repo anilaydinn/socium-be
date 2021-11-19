@@ -93,7 +93,7 @@ func (repository *Repository) GetUserByEmail(email string) (*model.User, error) 
 	cur := collection.FindOne(ctx, filter)
 
 	if cur.Err() != nil {
-		return nil, cur.Err()
+		return nil, errors.UserNotFound
 	}
 
 	if cur == nil {
