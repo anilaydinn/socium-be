@@ -60,6 +60,7 @@ func TestRegisterUser(t *testing.T) {
 				So(actualResult.Name, ShouldEqual, userDTO.Name)
 				So(actualResult.Surname, ShouldEqual, userDTO.Surname)
 				So(actualResult.Email, ShouldEqual, userDTO.Email)
+				So(actualResult.UserType, ShouldEqual, "user")
 			})
 		})
 	})
@@ -79,6 +80,7 @@ func TestLoginUser(t *testing.T) {
 			Name:     "Test Name",
 			Surname:  "Test Surname",
 			Password: "$2a$10$WCtghenC3N2Kg6ZjcoN/6O7fEJgTz5UzN65JoCGfxabqfEGJrxdBu",
+			UserType: "user",
 		}
 		testRepository.RegisterUser(registeredUser)
 

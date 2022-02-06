@@ -22,6 +22,7 @@ type UserEntity struct {
 	Surname  string `bson:"surname"`
 	Email    string `bson:"email"`
 	Password string `bson:"password"`
+	UserType string `bson:"userType"`
 }
 
 func NewRepository(uri string) *Repository {
@@ -119,6 +120,7 @@ func convertUserModelToUserEntity(user model.User) UserEntity {
 		Surname:  user.Surname,
 		Email:    user.Email,
 		Password: user.Password,
+		UserType: user.UserType,
 	}
 }
 
@@ -129,5 +131,6 @@ func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 		Surname:  userEntity.Surname,
 		Email:    userEntity.Email,
 		Password: userEntity.Password,
+		UserType: userEntity.UserType,
 	}
 }

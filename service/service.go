@@ -35,6 +35,7 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 		Surname:  userDTO.Surname,
 		Email:    userDTO.Email,
 		Password: string(hashedPassword),
+		UserType: "user",
 	}
 
 	newUser, err := service.repository.RegisterUser(user)
@@ -61,9 +62,9 @@ func (service *Service) LoginUser(userCredentialsDTO model.UserCredentialsDTO) (
 		return nil, nil, errors.WrongPasswordError
 	}
 
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    user.ID,
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, model.CustomClaims{
+		UserType:       user.UserType,
+		StandardClaims: jwt.StandardClaims{},
 	})
 
 	token, err := claims.SignedString([]byte("fe7999d6-47fa-11ec-81d3-0242ac130003"))
