@@ -63,8 +63,10 @@ func (service *Service) LoginUser(userCredentialsDTO model.UserCredentialsDTO) (
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, model.CustomClaims{
-		UserType:       user.UserType,
-		StandardClaims: jwt.StandardClaims{},
+		UserType: user.UserType,
+		StandardClaims: jwt.StandardClaims{
+			Issuer: user.ID,
+		},
 	})
 
 	token, err := claims.SignedString([]byte("fe7999d6-47fa-11ec-81d3-0242ac130003"))
