@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -19,4 +20,14 @@ func GenerateUUID(length int) string {
 	}
 
 	return uuid[0:length]
+}
+
+func GetDBUrl() string {
+	databaseUrl := os.Getenv("DATABASE_URL")
+
+	if databaseUrl == "" {
+		return "mongodb://localhost:27017"
+	}
+
+	return databaseUrl
 }

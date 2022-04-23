@@ -5,12 +5,15 @@ import (
 	"github.com/anilaydinn/socium-be/middleware"
 	"github.com/anilaydinn/socium-be/repository"
 	"github.com/anilaydinn/socium-be/service"
+	"github.com/anilaydinn/socium-be/utils"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
-	repository := repository.NewRepository("mongodb+srv://sociumtest:Se6iRf8elvL6Fcn6@cluster0.g1hlq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+	dbURL := utils.GetDBUrl()
+
+	repository := repository.NewRepository(dbURL)
 	service := service.NewService(repository)
 	api := controller.NewAPI(&service)
 
