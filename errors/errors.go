@@ -4,5 +4,6 @@ import (
 	"errors"
 )
 
+var Unauthorized error = errors.New("Unauthorized!")
 var UserNotFound error = errors.New("User not found!")
-var WrongPasswordError = errors.New("Wrong password!")
+var WrongPassword error = errors.New("Wrong password!")

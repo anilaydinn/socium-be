@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/gofiber/fiber/v2"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -16,7 +17,7 @@ import (
 	"github.com/anilaydinn/socium-be/model"
 	"github.com/anilaydinn/socium-be/repository"
 	"github.com/anilaydinn/socium-be/service"
-	"github.com/gofiber/fiber"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 

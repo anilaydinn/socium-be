@@ -4,7 +4,7 @@ import (
 	"github.com/anilaydinn/socium-be/errors"
 	"github.com/anilaydinn/socium-be/model"
 	"github.com/anilaydinn/socium-be/service"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 type API struct {
@@ -27,13 +27,14 @@ func NewAPI(service *service.Service) API {
 	}
 }
 
-func (api *API) RegisterUserHandler(c *fiber.Ctx) {
+func (api *API) RegisterUserHandler(c *fiber.Ctx) error {
 	userDTO := model.UserDTO{}
 
 	err := c.BodyParser(&userDTO)
 
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
+		return nil
 	}
 
 	user, err := api.service.RegisterUser(userDTO)
@@ -45,15 +46,17 @@ func (api *API) RegisterUserHandler(c *fiber.Ctx) {
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}
+	return nil
 }
 
-func (api *API) LoginUserHandler(c *fiber.Ctx) {
+func (api *API) LoginUserHandler(c *fiber.Ctx) error {
 	userCredentialsDTO := model.UserCredentialsDTO{}
 
 	err := c.BodyParser(&userCredentialsDTO)
 
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
+		return nil
 	}
 
 	token, cookie, err := api.service.LoginUser(userCredentialsDTO)
@@ -68,4 +71,5 @@ func (api *API) LoginUserHandler(c *fiber.Ctx) {
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}
+	return nil
 }
