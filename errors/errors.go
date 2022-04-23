@@ -7,3 +7,4 @@ import (
 var Unauthorized error = errors.New("Unauthorized!")
 var UserNotFound error = errors.New("User not found!")
 var WrongPassword error = errors.New("Wrong password!")
+var UserAlreadyActivated error = errors.New("User already activated!")

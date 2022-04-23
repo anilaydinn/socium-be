@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/anilaydinn/socium-be/email"
 	"github.com/anilaydinn/socium-be/errors"
 	"github.com/anilaydinn/socium-be/model"
 	"github.com/anilaydinn/socium-be/repository"
@@ -8,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
+	"os"
 	"time"
 )
 
@@ -41,6 +43,11 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 
 	newUser, err := service.repository.RegisterUser(user)
 
+	if err != nil {
+		return nil, err
+	}
+
+	err = email.SendMail(newUser.Email, "Complete Registration", "Please click "+os.Getenv("PROD_HOSTNAME")+"/activation/"+user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +107,11 @@ func (service *Service) Activation(userID string) (*model.User, error) {
 		return nil, errors.UserNotFound
 	}
 
-	user.IsActivated = true
+	if !user.IsActivated {
+		user.IsActivated = true
+	} else {
+		return nil, errors.UserAlreadyActivated
+	}
 
 	return service.repository.UpdateUser(userID, *user)
 }
