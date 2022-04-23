@@ -30,12 +30,13 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 	}
 
 	user := model.User{
-		ID:       utils.GenerateUUID(8),
-		Name:     userDTO.Name,
-		Surname:  userDTO.Surname,
-		Email:    userDTO.Email,
-		Password: string(hashedPassword),
-		UserType: "user",
+		ID:          utils.GenerateUUID(8),
+		Name:        userDTO.Name,
+		Surname:     userDTO.Surname,
+		Email:       userDTO.Email,
+		Password:    string(hashedPassword),
+		UserType:    "user",
+		IsActivated: false,
 	}
 
 	newUser, err := service.repository.RegisterUser(user)
@@ -56,6 +57,10 @@ func (service *Service) LoginUser(userCredentialsDTO model.UserCredentialsDTO) (
 
 	if user == nil {
 		return nil, nil, errors.UserNotFound
+	}
+
+	if !user.IsActivated {
+		return nil, nil, errors.Unauthorized
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userCredentialsDTO.Password)); err != nil {

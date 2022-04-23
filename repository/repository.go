@@ -17,12 +17,13 @@ type Repository struct {
 }
 
 type UserEntity struct {
-	ID       string `bson:"id"`
-	Name     string `bson:"name"`
-	Surname  string `bson:"surname"`
-	Email    string `bson:"email"`
-	Password string `bson:"password"`
-	UserType string `bson:"userType"`
+	ID          string `bson:"id"`
+	Name        string `bson:"name"`
+	Surname     string `bson:"surname"`
+	Email       string `bson:"email"`
+	Password    string `bson:"password"`
+	UserType    string `bson:"userType"`
+	IsActivated bool   `bson:"isActivated"`
 }
 
 func NewRepository(uri string) *Repository {
@@ -115,22 +116,24 @@ func (repository *Repository) GetUserByEmail(email string) (*model.User, error) 
 
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
-		ID:       user.ID,
-		Name:     user.Name,
-		Surname:  user.Surname,
-		Email:    user.Email,
-		Password: user.Password,
-		UserType: user.UserType,
+		ID:          user.ID,
+		Name:        user.Name,
+		Surname:     user.Surname,
+		Email:       user.Email,
+		Password:    user.Password,
+		UserType:    user.UserType,
+		IsActivated: user.IsActivated,
 	}
 }
 
 func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 	return model.User{
-		ID:       userEntity.ID,
-		Name:     userEntity.Name,
-		Surname:  userEntity.Surname,
-		Email:    userEntity.Email,
-		Password: userEntity.Password,
-		UserType: userEntity.UserType,
+		ID:          userEntity.ID,
+		Name:        userEntity.Name,
+		Surname:     userEntity.Surname,
+		Email:       userEntity.Email,
+		Password:    userEntity.Password,
+		UserType:    userEntity.UserType,
+		IsActivated: userEntity.IsActivated,
 	}
 }

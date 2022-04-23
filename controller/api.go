@@ -63,6 +63,8 @@ func (api *API) LoginUserHandler(c *fiber.Ctx) error {
 		c.Status(fiber.StatusOK)
 	case errors.UserNotFound:
 		c.Status(fiber.StatusBadRequest)
+	case errors.Unauthorized:
+		c.Status(fiber.StatusUnauthorized)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

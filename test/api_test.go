@@ -64,6 +64,7 @@ func TestRegisterUser(t *testing.T) {
 				So(actualResult.Surname, ShouldEqual, userDTO.Surname)
 				So(actualResult.Email, ShouldEqual, userDTO.Email)
 				So(actualResult.UserType, ShouldEqual, "user")
+				So(actualResult.IsActivated, ShouldEqual, false)
 			})
 		})
 	})
@@ -80,12 +81,13 @@ func TestLoginUser(t *testing.T) {
 		api.SetupApp(app)
 
 		registeredUser := model.User{
-			ID:       utils.GenerateUUID(8),
-			Email:    "test@gmail.com",
-			Name:     "Test Name",
-			Surname:  "Test Surname",
-			Password: "$2a$10$WCtghenC3N2Kg6ZjcoN/6O7fEJgTz5UzN65JoCGfxabqfEGJrxdBu",
-			UserType: "user",
+			ID:          utils.GenerateUUID(8),
+			Email:       "test@gmail.com",
+			Name:        "Test Name",
+			Surname:     "Test Surname",
+			Password:    "$2a$10$WCtghenC3N2Kg6ZjcoN/6O7fEJgTz5UzN65JoCGfxabqfEGJrxdBu",
+			UserType:    "user",
+			IsActivated: true,
 		}
 		testRepository.RegisterUser(registeredUser)
 
@@ -138,6 +140,50 @@ func TestLoginUser(t *testing.T) {
 
 			Convey("Then status code should be 400", func() {
 				So(res.StatusCode, ShouldEqual, fiber.StatusBadRequest)
+			})
+		})
+	})
+}
+
+func TestNotActivatedUserLogin(t *testing.T) {
+	Convey("Given already register user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser := model.User{
+			ID:          utils.GenerateUUID(8),
+			Email:       "test@gmail.com",
+			Name:        "Test Name",
+			Surname:     "Test Surname",
+			Password:    "$2a$10$WCtghenC3N2Kg6ZjcoN/6O7fEJgTz5UzN65JoCGfxabqfEGJrxdBu",
+			UserType:    "user",
+			IsActivated: false,
+		}
+		testRepository.RegisterUser(registeredUser)
+
+		Convey("When login user request sent", func() {
+			userCredentialsDTO := model.UserCredentialsDTO{
+				Email:    "test@gmail.com",
+				Password: "123123",
+			}
+
+			reqBody, err := json.Marshal(userCredentialsDTO)
+			So(err, ShouldBeNil)
+
+			req, _ := http.NewRequest("POST", "/login", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 401", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusUnauthorized)
 			})
 		})
 	})

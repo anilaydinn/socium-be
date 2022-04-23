@@ -3,12 +3,13 @@ package model
 import "github.com/dgrijalva/jwt-go"
 
 type User struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	UserType string `json:"userType"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Surname     string `json:"surname"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	UserType    string `json:"userType"`
+	IsActivated bool   `json:"isActivated"`
 }
 
 type UserDTO struct {
