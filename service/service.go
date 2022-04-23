@@ -24,6 +24,10 @@ func NewService(repository *repository.Repository) Service {
 }
 
 func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error) {
+	alreadyRegisteredUser, err := service.repository.GetUserByEmail(userDTO.Email)
+	if alreadyRegisteredUser != nil {
+		return nil, errors.UserAlreadyRegistered
+	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userDTO.Password), bcrypt.DefaultCost)
 

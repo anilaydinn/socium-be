@@ -39,6 +39,8 @@ func (api *API) RegisterUserHandler(c *fiber.Ctx) error {
 	case nil:
 		c.JSON(user)
 		c.Status(fiber.StatusCreated)
+	case errors.UserAlreadyRegistered:
+		c.Status(fiber.StatusBadRequest)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

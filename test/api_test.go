@@ -70,6 +70,50 @@ func TestRegisterUser(t *testing.T) {
 	})
 }
 
+func TestAlreadyRegisteredUser(t *testing.T) {
+	Convey("Given a registered user and valid user data", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+		api.SetupApp(app)
+
+		user := model.User{
+			ID:       utils.GenerateUUID(8),
+			Name:     "John",
+			Surname:  "Obama",
+			Email:    "john@gmail.com",
+			Password: "123123",
+			UserType: "user",
+		}
+		testRepository.RegisterUser(user)
+
+		Convey("When add user request sent", func() {
+			userDTO := model.UserDTO{
+				Name:     "John",
+				Surname:  "Obama",
+				Email:    "john@gmail.com",
+				Password: "123123",
+			}
+
+			reqBody, err := json.Marshal(userDTO)
+			So(err, ShouldBeNil)
+
+			req, _ := http.NewRequest("POST", "/register", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 400", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusBadRequest)
+			})
+		})
+	})
+}
+
 func TestLoginUser(t *testing.T) {
 	Convey("Given already register user", t, func() {
 		app := fiber.New()
