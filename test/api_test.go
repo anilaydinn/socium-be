@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/anilaydinn/socium-be/middleware"
 	"github.com/gofiber/fiber/v2"
 	"io/ioutil"
 	"net/http"
@@ -23,11 +24,12 @@ import (
 
 func TestRegisterUser(t *testing.T) {
 	Convey("Given a valid user data", t, func() {
+		app := fiber.New()
 		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
 		service := service.NewService(testRepository)
 		api := controller.NewAPI(&service)
-
-		app := controller.Handler(&api)
+		api.SetupApp(app)
 
 		Convey("When add user request sent", func() {
 			userDTO := model.UserDTO{
@@ -40,7 +42,7 @@ func TestRegisterUser(t *testing.T) {
 			reqBody, err := json.Marshal(userDTO)
 			So(err, ShouldBeNil)
 
-			req, _ := http.NewRequest("POST", "/users", bytes.NewReader(reqBody))
+			req, _ := http.NewRequest("POST", "/register", bytes.NewReader(reqBody))
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
 
@@ -69,11 +71,13 @@ func TestRegisterUser(t *testing.T) {
 
 func TestLoginUser(t *testing.T) {
 	Convey("Given already register user", t, func() {
+		app := fiber.New()
 		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
 		service := service.NewService(testRepository)
 		api := controller.NewAPI(&service)
 
-		app := controller.Handler(&api)
+		api.SetupApp(app)
 
 		registeredUser := model.User{
 			ID:       utils.GenerateUUID(8),
@@ -94,7 +98,7 @@ func TestLoginUser(t *testing.T) {
 			reqBody, err := json.Marshal(userCredentialsDTO)
 			So(err, ShouldBeNil)
 
-			req, _ := http.NewRequest("POST", "/users/login", bytes.NewReader(reqBody))
+			req, _ := http.NewRequest("POST", "/login", bytes.NewReader(reqBody))
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
 
@@ -125,7 +129,7 @@ func TestLoginUser(t *testing.T) {
 			reqBody, err := json.Marshal(userCredentialsDTO)
 			So(err, ShouldBeNil)
 
-			req, _ := http.NewRequest("POST", "/users/login", bytes.NewReader(reqBody))
+			req, _ := http.NewRequest("POST", "/login", bytes.NewReader(reqBody))
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
 

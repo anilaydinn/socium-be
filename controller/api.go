@@ -11,14 +11,9 @@ type API struct {
 	service *service.Service
 }
 
-func Handler(api *API) *fiber.App {
-
-	app := fiber.New()
-
-	app.Post("/users", api.RegisterUserHandler)
-	app.Post("/users/login", api.LoginUserHandler)
-
-	return app
+func (api *API) SetupApp(app *fiber.App) {
+	app.Post("/register", api.RegisterUserHandler)
+	app.Post("/login", api.LoginUserHandler)
 }
 
 func NewAPI(service *service.Service) API {

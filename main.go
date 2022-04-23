@@ -6,6 +6,7 @@ import (
 	"github.com/anilaydinn/socium-be/repository"
 	"github.com/anilaydinn/socium-be/service"
 	"github.com/anilaydinn/socium-be/utils"
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -13,14 +14,15 @@ import (
 func main() {
 	dbURL := utils.GetDBUrl()
 
+	app := fiber.New()
+	app.Use(cors.New())
+	app.Use(logger.New())
 	repository := repository.NewRepository(dbURL)
+	middleware.SetupMiddleWare(app, *repository)
 	service := service.NewService(repository)
 	api := controller.NewAPI(&service)
 
-	app := controller.Handler(&api)
-	middleware.SetupMiddleWare(app, *repository)
-	app.Use(cors.New())
-	app.Use(logger.New())
+	api.SetupApp(app)
 
 	app.Listen(":8080")
 }
