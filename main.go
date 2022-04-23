@@ -4,6 +4,8 @@ import (
 	"github.com/anilaydinn/socium-be/controller"
 	"github.com/anilaydinn/socium-be/repository"
 	"github.com/anilaydinn/socium-be/service"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
@@ -12,6 +14,8 @@ func main() {
 	api := controller.NewAPI(&service)
 
 	app := controller.Handler(&api)
+	app.Use(cors.New())
+	app.Use(logger.New())
 
 	app.Listen(":8080")
 }
