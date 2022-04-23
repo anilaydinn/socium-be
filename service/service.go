@@ -119,3 +119,17 @@ func (service *Service) Activation(userID string) (*model.User, error) {
 
 	return service.repository.UpdateUser(userID, *user)
 }
+
+func (service *Service) ForgotPassword(forgotPasswordDTO model.ForgotPasswordDTO) error {
+	registeredUser, _ := service.repository.GetUserByEmail(forgotPasswordDTO.Email)
+	if registeredUser == nil {
+		return errors.UserNotFound
+	}
+
+	err := email.SendMail(forgotPasswordDTO.Email, "Reset Password", "You can reset your password click "+os.Getenv("REACT_HOSTNAME")+"/reset-password/"+registeredUser.ID+" here.")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

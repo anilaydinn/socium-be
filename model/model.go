@@ -24,6 +24,10 @@ type UserCredentialsDTO struct {
 	Password string `json:"password"`
 }
 
+type ForgotPasswordDTO struct {
+	Email string `json:"email"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }

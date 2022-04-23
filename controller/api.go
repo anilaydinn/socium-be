@@ -15,6 +15,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/register", api.RegisterUserHandler)
 	app.Post("/login", api.LoginUserHandler)
 	app.Get("/activation/:userID", api.ActivationHandler)
+	app.Post("/forgotPassword", api.ForgotPasswordHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -83,6 +84,27 @@ func (api *API) ActivationHandler(c *fiber.Ctx) error {
 	case nil:
 		c.Status(fiber.StatusOK)
 		c.JSON(user)
+	case errors.UserNotFound:
+		c.Status(fiber.StatusNotFound)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) ForgotPasswordHandler(c *fiber.Ctx) error {
+	forgotPasswordDTO := model.ForgotPasswordDTO{}
+	err := c.BodyParser(&forgotPasswordDTO)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	err = api.service.ForgotPassword(forgotPasswordDTO)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
 	case errors.UserNotFound:
 		c.Status(fiber.StatusNotFound)
 	default:
