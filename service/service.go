@@ -89,3 +89,18 @@ func (service *Service) LoginUser(userCredentialsDTO model.UserCredentialsDTO) (
 		Token: token,
 	}, &cookie, nil
 }
+
+func (service *Service) Activation(userID string) (*model.User, error) {
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.UserNotFound
+	}
+
+	user.IsActivated = true
+
+	return service.repository.UpdateUser(userID, *user)
+}

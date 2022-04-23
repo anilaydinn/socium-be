@@ -14,6 +14,7 @@ type API struct {
 func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/register", api.RegisterUserHandler)
 	app.Post("/login", api.LoginUserHandler)
+	app.Get("/activation/:userID", api.ActivationHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -65,6 +66,23 @@ func (api *API) LoginUserHandler(c *fiber.Ctx) error {
 		c.Status(fiber.StatusBadRequest)
 	case errors.Unauthorized:
 		c.Status(fiber.StatusUnauthorized)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) ActivationHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+
+	user, err := api.service.Activation(userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(user)
+	case errors.UserNotFound:
+		c.Status(fiber.StatusNotFound)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}
