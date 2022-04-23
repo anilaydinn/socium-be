@@ -59,7 +59,7 @@ func (service *Service) LoginUser(userCredentialsDTO model.UserCredentialsDTO) (
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userCredentialsDTO.Password)); err != nil {
-		return nil, nil, errors.WrongPasswordError
+		return nil, nil, errors.WrongPassword
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, model.CustomClaims{
