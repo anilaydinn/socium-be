@@ -16,6 +16,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/login", api.LoginUserHandler)
 	app.Get("/activation/:userID", api.ActivationHandler)
 	app.Post("/forgotPassword", api.ForgotPasswordHandler)
+	app.Patch("/resetPassword/:userID", api.ResetPasswordHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -107,6 +108,26 @@ func (api *API) ForgotPasswordHandler(c *fiber.Ctx) error {
 		c.Status(fiber.StatusOK)
 	case errors.UserNotFound:
 		c.Status(fiber.StatusNotFound)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) ResetPasswordHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+	resetPasswordDTO := model.ResetPasswordDTO{}
+	err := c.BodyParser(&resetPasswordDTO)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	err = api.service.ResetPassword(userID, resetPasswordDTO)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

@@ -133,3 +133,23 @@ func (service *Service) ForgotPassword(forgotPasswordDTO model.ForgotPasswordDTO
 
 	return nil
 }
+
+func (service *Service) ResetPassword(userID string, resetPasswordDTO model.ResetPasswordDTO) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(resetPasswordDTO.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return errors.UserNotFound
+	}
+
+	user.Password = string(hashedPassword)
+
+	_, err = service.repository.UpdateUser(userID, *user)
+	if err != nil {
+		return err
+	}
+	return nil
+}

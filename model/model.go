@@ -28,6 +28,10 @@ type ForgotPasswordDTO struct {
 	Email string `json:"email"`
 }
 
+type ResetPasswordDTO struct {
+	Password string `json:"password"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }

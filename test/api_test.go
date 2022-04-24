@@ -338,6 +338,49 @@ func TestForgotPassword(t *testing.T) {
 	})
 }
 
+func TestResetPassword(t *testing.T) {
+	Convey("Given that user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser := model.User{
+			ID:          utils.GenerateUUID(8),
+			Email:       "test@gmail.com",
+			Name:        "Test Name",
+			Surname:     "Test Surname",
+			Password:    "$2a$10$WCtghenC3N2Kg6ZjcoN/6O7fEJgTz5UzN65JoCGfxabqfEGJrxdBu",
+			UserType:    "user",
+			IsActivated: false,
+		}
+		testRepository.RegisterUser(registeredUser)
+
+		Convey("When new user password data sent with user id", func() {
+
+			resetPasswordDTO := model.ResetPasswordDTO{
+				Password: "332211",
+			}
+			reqBody, err := json.Marshal(resetPasswordDTO)
+			So(err, ShouldBeNil)
+
+			req, err := http.NewRequest("PATCH", "/resetPassword/"+registeredUser.ID, bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
+
+			res, err := app.Test(req, 300000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 200", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
+			})
+		})
+	})
+}
+
 func GetCleanTestRepository() *repository.Repository {
 	repository := repository.NewRepository("mongodb://localhost:27017")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
