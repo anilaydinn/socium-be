@@ -126,6 +126,10 @@ func (service *Service) ForgotPassword(forgotPasswordDTO model.ForgotPasswordDTO
 		return errors.UserNotFound
 	}
 
+	if !registeredUser.IsActivated {
+		return errors.UserNotActivated
+	}
+
 	err := email.SendMail(forgotPasswordDTO.Email, "Reset Password", "You can reset your password click "+os.Getenv("REACT_HOSTNAME")+"/reset-password/"+registeredUser.ID+" here.")
 	if err != nil {
 		return err

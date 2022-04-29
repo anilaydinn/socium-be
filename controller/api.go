@@ -108,6 +108,8 @@ func (api *API) ForgotPasswordHandler(c *fiber.Ctx) error {
 		c.Status(fiber.StatusOK)
 	case errors.UserNotFound:
 		c.Status(fiber.StatusNotFound)
+	case errors.UserNotActivated:
+		c.Status(fiber.StatusBadRequest)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}
