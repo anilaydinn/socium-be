@@ -12,11 +12,12 @@ type API struct {
 }
 
 func (api *API) SetupApp(app *fiber.App) {
-	app.Post("/register", api.RegisterUserHandler)
-	app.Post("/login", api.LoginUserHandler)
-	app.Get("/activation/:userID", api.ActivationHandler)
-	app.Post("/forgotPassword", api.ForgotPasswordHandler)
-	app.Patch("/resetPassword/:userID", api.ResetPasswordHandler)
+	app.Post("/api/register", api.RegisterUserHandler)
+	app.Post("/api/login", api.LoginUserHandler)
+	app.Get("/api/activation/:userID", api.ActivationHandler)
+	app.Post("/api/forgotPassword", api.ForgotPasswordHandler)
+	app.Patch("/api/resetPassword/:userID", api.ResetPasswordHandler)
+	app.Get("/api/users/:userID", api.GetUserHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -130,6 +131,26 @@ func (api *API) ResetPasswordHandler(c *fiber.Ctx) error {
 	switch err {
 	case nil:
 		c.Status(fiber.StatusOK)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) GetUserHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+
+	if len(userID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	user, err := api.service.GetUser(userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(user)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

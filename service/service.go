@@ -157,3 +157,7 @@ func (service *Service) ResetPassword(userID string, resetPasswordDTO model.Rese
 	}
 	return nil
 }
+
+func (service *Service) GetUser(userID string) (*model.User, error) {
+	return service.repository.GetUser(userID)
+}
