@@ -32,6 +32,21 @@ type ResetPasswordDTO struct {
 	Password string `json:"password"`
 }
 
+type PostDTO struct {
+	UserID      string `json:"userId"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+}
+
+type Post struct {
+	ID              string   `json:"id"`
+	UserID          string   `json:"userId"`
+	User            *User    `json:"user"`
+	Description     string   `json:"description"`
+	Image           string   `json:"image"`
+	WhoLikesUserIDs []string `json:"whoLikesUserIds"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }

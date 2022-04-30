@@ -483,6 +483,67 @@ func TestGetUser(t *testing.T) {
 	})
 }
 
+func TestCreatePost(t *testing.T) {
+	Convey("Given a authenticated user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser := model.User{
+			ID:          "3c0bbdae",
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		testRepository.RegisterUser(registeredUser)
+
+		Convey("When user send create post request", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
+
+			postDTO := model.PostDTO{
+				UserID:      registeredUser.ID,
+				Description: "Post description",
+				Image:       "cxzcxcxzczxöc",
+			}
+			reqBody, err := json.Marshal(postDTO)
+			So(err, ShouldBeNil)
+
+			req, err := http.NewRequest(http.MethodPost, "/user/posts", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+			req.Header.Set("Content-Length", strconv.Itoa(len(reqBody)))
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 201", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusCreated)
+			})
+
+			Convey("Then created post should return", func() {
+				actualResult := model.Post{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult.ID, ShouldNotBeNil)
+				So(actualResult.UserID, ShouldEqual, postDTO.UserID)
+				So(actualResult.Description, ShouldEqual, postDTO.Description)
+				So(actualResult.Image, ShouldEqual, postDTO.Image)
+				So(actualResult.WhoLikesUserIDs, ShouldBeNil)
+				So(actualResult.User, ShouldBeNil)
+			})
+		})
+	})
+}
+
 func GetCleanTestRepository() *repository.Repository {
 	repository := repository.NewRepository("mongodb://localhost:27017")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

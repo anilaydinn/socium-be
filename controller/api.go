@@ -18,6 +18,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/api/forgotPassword", api.ForgotPasswordHandler)
 	app.Patch("/api/resetPassword/:userID", api.ResetPasswordHandler)
 	app.Get("/api/users/:userID", api.GetUserHandler)
+	app.Post("/user/posts", api.CreatePost)
 }
 
 func NewAPI(service *service.Service) API {
@@ -151,6 +152,28 @@ func (api *API) GetUserHandler(c *fiber.Ctx) error {
 	case nil:
 		c.Status(fiber.StatusOK)
 		c.JSON(user)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) CreatePost(c *fiber.Ctx) error {
+	postDTO := model.PostDTO{}
+	err := c.BodyParser(&postDTO)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	post, err := api.service.CreatePost(postDTO)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusCreated)
+		c.JSON(post)
+	case errors.PostNotFound:
+		c.Status(fiber.StatusNotFound)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

@@ -26,6 +26,14 @@ type UserEntity struct {
 	IsActivated bool   `bson:"isActivated"`
 }
 
+type PostEntity struct {
+	ID              string   `bson:"id"`
+	UserID          string   `bson:"userId"`
+	Description     string   `bson:"description"`
+	Image           string   `bson:"image"`
+	WhoLikesUserIDs []string `bson:"whoLikesUserIds"`
+}
+
 func NewRepository(uri string) *Repository {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
@@ -137,6 +145,51 @@ func (repository *Repository) UpdateUser(userID string, user model.User) (*model
 
 }
 
+func (repository *Repository) CreatePost(post model.Post) (*model.Post, error) {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	postEntity := convertPostModelToPostEntity(post)
+
+	_, err := collection.InsertOne(ctx, postEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.GetPost(postEntity.ID)
+}
+
+func (repository *Repository) GetPost(postID string) (*model.Post, error) {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": postID}
+
+	cur := collection.FindOne(ctx, filter)
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if cur == nil {
+		return nil, errors.PostNotFound
+	}
+
+	postEntity := PostEntity{}
+	err := cur.Decode(&postEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	post := convertPostEntityToPostModel(postEntity)
+
+	return &post, nil
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:          user.ID,
@@ -158,5 +211,25 @@ func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 		Password:    userEntity.Password,
 		UserType:    userEntity.UserType,
 		IsActivated: userEntity.IsActivated,
+	}
+}
+
+func convertPostModelToPostEntity(post model.Post) PostEntity {
+	return PostEntity{
+		ID:              post.ID,
+		UserID:          post.UserID,
+		Description:     post.Description,
+		Image:           post.Image,
+		WhoLikesUserIDs: post.WhoLikesUserIDs,
+	}
+}
+
+func convertPostEntityToPostModel(postEntity PostEntity) model.Post {
+	return model.Post{
+		ID:              postEntity.ID,
+		UserID:          postEntity.UserID,
+		Description:     postEntity.Description,
+		Image:           postEntity.Image,
+		WhoLikesUserIDs: postEntity.WhoLikesUserIDs,
 	}
 }

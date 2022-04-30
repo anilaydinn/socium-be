@@ -85,7 +85,7 @@ func (service *Service) LoginUser(userCredentialsDTO model.UserCredentialsDTO) (
 		},
 	})
 
-	token, err := claims.SignedString([]byte("fe7999d6-47fa-11ec-81d3-0242ac130003"))
+	token, err := claims.SignedString([]byte(""))
 
 	if err != nil {
 		return nil, nil, err
@@ -160,4 +160,15 @@ func (service *Service) ResetPassword(userID string, resetPasswordDTO model.Rese
 
 func (service *Service) GetUser(userID string) (*model.User, error) {
 	return service.repository.GetUser(userID)
+}
+
+func (service *Service) CreatePost(postDTO model.PostDTO) (*model.Post, error) {
+	post := model.Post{
+		ID:          utils.GenerateUUID(8),
+		UserID:      postDTO.UserID,
+		Description: postDTO.Description,
+		Image:       postDTO.Image,
+	}
+
+	return service.repository.CreatePost(post)
 }
