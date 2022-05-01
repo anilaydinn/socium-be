@@ -36,6 +36,7 @@ type PostDTO struct {
 	UserID      string `json:"userId"`
 	Description string `json:"description"`
 	Image       string `json:"image"`
+	IsPrivate   bool   `json:"isPrivate"`
 }
 
 type Post struct {
@@ -44,6 +45,7 @@ type Post struct {
 	User            *User    `json:"user"`
 	Description     string   `json:"description"`
 	Image           string   `json:"image"`
+	IsPrivate       bool     `json:"isPrivate"`
 	WhoLikesUserIDs []string `json:"whoLikesUserIds"`
 }
 

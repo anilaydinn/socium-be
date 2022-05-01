@@ -168,6 +168,7 @@ func (service *Service) CreatePost(postDTO model.PostDTO) (*model.Post, error) {
 		UserID:      postDTO.UserID,
 		Description: postDTO.Description,
 		Image:       postDTO.Image,
+		IsPrivate:   postDTO.IsPrivate,
 	}
 
 	return service.repository.CreatePost(post)

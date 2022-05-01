@@ -511,6 +511,7 @@ func TestCreatePost(t *testing.T) {
 				UserID:      registeredUser.ID,
 				Description: "Post description",
 				Image:       "cxzcxcxzczxöc",
+				IsPrivate:   true,
 			}
 			reqBody, err := json.Marshal(postDTO)
 			So(err, ShouldBeNil)
@@ -537,6 +538,7 @@ func TestCreatePost(t *testing.T) {
 				So(actualResult.UserID, ShouldEqual, postDTO.UserID)
 				So(actualResult.Description, ShouldEqual, postDTO.Description)
 				So(actualResult.Image, ShouldEqual, postDTO.Image)
+				So(actualResult.IsPrivate, ShouldEqual, postDTO.IsPrivate)
 				So(actualResult.WhoLikesUserIDs, ShouldBeNil)
 				So(actualResult.User, ShouldBeNil)
 			})

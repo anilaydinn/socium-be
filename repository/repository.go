@@ -31,6 +31,7 @@ type PostEntity struct {
 	UserID          string   `bson:"userId"`
 	Description     string   `bson:"description"`
 	Image           string   `bson:"image"`
+	IsPrivate       bool     `bson:"isPrivate"`
 	WhoLikesUserIDs []string `bson:"whoLikesUserIds"`
 }
 
@@ -220,6 +221,7 @@ func convertPostModelToPostEntity(post model.Post) PostEntity {
 		UserID:          post.UserID,
 		Description:     post.Description,
 		Image:           post.Image,
+		IsPrivate:       post.IsPrivate,
 		WhoLikesUserIDs: post.WhoLikesUserIDs,
 	}
 }
@@ -230,6 +232,7 @@ func convertPostEntityToPostModel(postEntity PostEntity) model.Post {
 		UserID:          postEntity.UserID,
 		Description:     postEntity.Description,
 		Image:           postEntity.Image,
+		IsPrivate:       postEntity.IsPrivate,
 		WhoLikesUserIDs: postEntity.WhoLikesUserIDs,
 	}
 }
