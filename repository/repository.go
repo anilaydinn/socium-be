@@ -27,12 +27,14 @@ type UserEntity struct {
 }
 
 type PostEntity struct {
-	ID              string   `bson:"id"`
-	UserID          string   `bson:"userId"`
-	Description     string   `bson:"description"`
-	Image           string   `bson:"image"`
-	IsPrivate       bool     `bson:"isPrivate"`
-	WhoLikesUserIDs []string `bson:"whoLikesUserIds"`
+	ID              string    `bson:"id"`
+	UserID          string    `bson:"userId"`
+	Description     string    `bson:"description"`
+	Image           string    `bson:"image"`
+	IsPrivate       bool      `bson:"isPrivate"`
+	WhoLikesUserIDs []string  `bson:"whoLikesUserIds"`
+	CreatedAt       time.Time `bson:"createdAt"`
+	UpdatedAt       time.Time `bson:"updatedAt"`
 }
 
 func NewRepository(uri string) *Repository {
@@ -223,6 +225,8 @@ func convertPostModelToPostEntity(post model.Post) PostEntity {
 		Image:           post.Image,
 		IsPrivate:       post.IsPrivate,
 		WhoLikesUserIDs: post.WhoLikesUserIDs,
+		CreatedAt:       post.CreatedAt,
+		UpdatedAt:       post.UpdatedAt,
 	}
 }
 
@@ -234,5 +238,7 @@ func convertPostEntityToPostModel(postEntity PostEntity) model.Post {
 		Image:           postEntity.Image,
 		IsPrivate:       postEntity.IsPrivate,
 		WhoLikesUserIDs: postEntity.WhoLikesUserIDs,
+		CreatedAt:       postEntity.CreatedAt,
+		UpdatedAt:       postEntity.UpdatedAt,
 	}
 }

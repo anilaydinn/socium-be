@@ -1,6 +1,9 @@
 package model
 
-import "github.com/dgrijalva/jwt-go"
+import (
+	"github.com/dgrijalva/jwt-go"
+	"time"
+)
 
 type User struct {
 	ID          string `json:"id"`
@@ -40,13 +43,15 @@ type PostDTO struct {
 }
 
 type Post struct {
-	ID              string   `json:"id"`
-	UserID          string   `json:"userId"`
-	User            *User    `json:"user"`
-	Description     string   `json:"description"`
-	Image           string   `json:"image"`
-	IsPrivate       bool     `json:"isPrivate"`
-	WhoLikesUserIDs []string `json:"whoLikesUserIds"`
+	ID              string    `json:"id"`
+	UserID          string    `json:"userId"`
+	User            *User     `json:"user"`
+	Description     string    `json:"description"`
+	Image           string    `json:"image"`
+	IsPrivate       bool      `json:"isPrivate"`
+	WhoLikesUserIDs []string  `json:"whoLikesUserIds"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
 type Token struct {

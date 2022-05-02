@@ -541,6 +541,8 @@ func TestCreatePost(t *testing.T) {
 				So(actualResult.IsPrivate, ShouldEqual, postDTO.IsPrivate)
 				So(actualResult.WhoLikesUserIDs, ShouldBeNil)
 				So(actualResult.User, ShouldBeNil)
+				So(actualResult.CreatedAt, ShouldEqual, time.Now().UTC().Round(time.Second))
+				So(actualResult.UpdatedAt, ShouldEqual, time.Now().UTC().Round(time.Second))
 			})
 		})
 	})
