@@ -193,7 +193,7 @@ func (repository *Repository) GetPost(postID string) (*model.Post, error) {
 	return &post, nil
 }
 
-func (repository *Repository) GetPosts() ([]model.Post, error) {
+func (repository *Repository) GetPosts(userID string) ([]model.Post, error) {
 	collection := repository.MongoClient.Database("socium").Collection("posts")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -201,7 +201,12 @@ func (repository *Repository) GetPosts() ([]model.Post, error) {
 	options := options.Find()
 	options.SetSort(bson.M{"createdAt": -1})
 
-	filter := bson.M{}
+	var filter bson.M
+	if len(userID) == 0 {
+		filter = bson.M{}
+	} else {
+		filter = bson.M{"userId": userID}
+	}
 
 	cur, err := collection.Find(ctx, filter, options)
 	if err != nil {

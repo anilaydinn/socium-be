@@ -182,7 +182,9 @@ func (api *API) CreatePostHandler(c *fiber.Ctx) error {
 }
 
 func (api *API) GetPostsHandler(c *fiber.Ctx) error {
-	posts, err := api.service.GetPosts()
+	userID := c.Query("userId")
+
+	posts, err := api.service.GetPosts(userID)
 
 	switch err {
 	case nil:

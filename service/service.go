@@ -176,8 +176,8 @@ func (service *Service) CreatePost(postDTO model.PostDTO) (*model.Post, error) {
 	return service.repository.CreatePost(post)
 }
 
-func (service *Service) GetPosts() ([]model.Post, error) {
-	posts, err := service.repository.GetPosts()
+func (service *Service) GetPosts(userID string) ([]model.Post, error) {
+	posts, err := service.repository.GetPosts(userID)
 	if err != nil {
 		return nil, err
 	}
