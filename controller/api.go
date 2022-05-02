@@ -18,7 +18,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/api/forgotPassword", api.ForgotPasswordHandler)
 	app.Patch("/api/resetPassword/:userID", api.ResetPasswordHandler)
 	app.Get("/api/users/:userID", api.GetUserHandler)
-	app.Post("/user/posts", api.CreatePost)
+	app.Post("/user/posts", api.CreatePostHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -158,7 +158,7 @@ func (api *API) GetUserHandler(c *fiber.Ctx) error {
 	return nil
 }
 
-func (api *API) CreatePost(c *fiber.Ctx) error {
+func (api *API) CreatePostHandler(c *fiber.Ctx) error {
 	postDTO := model.PostDTO{}
 	err := c.BodyParser(&postDTO)
 	if err != nil {
