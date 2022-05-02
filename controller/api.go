@@ -19,6 +19,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Patch("/api/resetPassword/:userID", api.ResetPasswordHandler)
 	app.Get("/api/users/:userID", api.GetUserHandler)
 	app.Post("/user/posts", api.CreatePostHandler)
+	app.Get("/user/posts", api.GetPostsHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -174,6 +175,19 @@ func (api *API) CreatePostHandler(c *fiber.Ctx) error {
 		c.JSON(post)
 	case errors.PostNotFound:
 		c.Status(fiber.StatusNotFound)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) GetPostsHandler(c *fiber.Ctx) error {
+	posts, err := api.service.GetPosts()
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(posts)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

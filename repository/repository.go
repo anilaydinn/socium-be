@@ -193,6 +193,34 @@ func (repository *Repository) GetPost(postID string) (*model.Post, error) {
 	return &post, nil
 }
 
+func (repository *Repository) GetPosts() ([]model.Post, error) {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	options := options.Find()
+	options.SetSort(bson.M{"createdAt": -1})
+
+	filter := bson.M{}
+
+	cur, err := collection.Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []model.Post
+	for cur.Next(ctx) {
+		postEntity := PostEntity{}
+		err := cur.Decode(&postEntity)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, convertPostEntityToPostModel(postEntity))
+	}
+
+	return posts, nil
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:          user.ID,

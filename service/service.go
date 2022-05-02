@@ -175,3 +175,20 @@ func (service *Service) CreatePost(postDTO model.PostDTO) (*model.Post, error) {
 
 	return service.repository.CreatePost(post)
 }
+
+func (service *Service) GetPosts() ([]model.Post, error) {
+	posts, err := service.repository.GetPosts()
+	if err != nil {
+		return nil, err
+	}
+
+	for i, post := range posts {
+		user, err := service.repository.GetUser(post.UserID)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].User = user
+	}
+
+	return posts, nil
+}
