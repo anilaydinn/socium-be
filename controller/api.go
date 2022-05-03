@@ -20,6 +20,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Get("/api/users/:userID", api.GetUserHandler)
 	app.Post("/user/posts", api.CreatePostHandler)
 	app.Get("/user/posts", api.GetPostsHandler)
+	app.Patch("/user/posts/:postID/like", api.LikePostHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -190,6 +191,27 @@ func (api *API) GetPostsHandler(c *fiber.Ctx) error {
 	case nil:
 		c.Status(fiber.StatusOK)
 		c.JSON(posts)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) LikePostHandler(c *fiber.Ctx) error {
+	postID := c.Params("postID")
+	likePostDTO := model.LikePostDTO{}
+	err := c.BodyParser(&likePostDTO)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	post, err := api.service.LikePost(postID, likePostDTO)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(post)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

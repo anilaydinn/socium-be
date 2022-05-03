@@ -226,6 +226,28 @@ func (repository *Repository) GetPosts(userID string) ([]model.Post, error) {
 	return posts, nil
 }
 
+func (repository *Repository) UpdatePost(postID string, post model.Post) (*model.Post, error) {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": postID}
+
+	postEntity := convertPostModelToPostEntity(post)
+
+	cur := collection.FindOneAndReplace(ctx, filter, postEntity)
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if cur == nil {
+		return nil, errors.PostNotFound
+	}
+
+	return repository.GetPost(postID)
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:          user.ID,

@@ -192,3 +192,19 @@ func (service *Service) GetPosts(userID string) ([]model.Post, error) {
 
 	return posts, nil
 }
+
+func (service *Service) LikePost(postID string, likePostDTO model.LikePostDTO) (*model.Post, error) {
+	post, err := service.repository.GetPost(postID)
+	if err != nil {
+		return nil, errors.PostNotFound
+	}
+
+	post.WhoLikesUserIDs = append(post.WhoLikesUserIDs, likePostDTO.UserID)
+
+	updatedPost, err := service.repository.UpdatePost(postID, *post)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedPost, nil
+}

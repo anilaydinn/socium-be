@@ -54,6 +54,10 @@ type Post struct {
 	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
+type LikePostDTO struct {
+	UserID string `json:"userId"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }
