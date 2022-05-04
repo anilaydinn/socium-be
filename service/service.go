@@ -188,9 +188,31 @@ func (service *Service) GetPosts(userID string) ([]model.Post, error) {
 			return nil, err
 		}
 		posts[i].User = user
+
+		comments, err := service.repository.GetCommentsByIDList(post.CommentIDs)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Comments = comments
 	}
 
 	return posts, nil
+}
+
+func (service *Service) GetPost(postID string) (*model.Post, error) {
+	post, err := service.repository.GetPost(postID)
+	if err != nil {
+		return nil, err
+	}
+
+	comments, err := service.repository.GetCommentsByIDList(post.CommentIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	post.Comments = comments
+
+	return post, nil
 }
 
 func (service *Service) LikePost(postID string, likePostDTO model.LikePostDTO) (*model.Post, error) {
@@ -211,4 +233,35 @@ func (service *Service) LikePost(postID string, likePostDTO model.LikePostDTO) (
 	}
 
 	return updatedPost, nil
+}
+
+func (service *Service) AddPostComment(postID string, commentDTO model.CommentDTO) (*model.Post, error) {
+	comment := model.Comment{
+		ID:        utils.GenerateUUID(8),
+		UserID:    commentDTO.UserID,
+		PostID:    postID,
+		User:      nil,
+		Content:   commentDTO.Content,
+		CreatedAt: time.Now().UTC().Round(time.Second),
+		UpdatedAt: time.Now().UTC().Round(time.Second),
+	}
+
+	newComment, err := service.repository.AddComment(comment)
+	if err != nil {
+		return nil, err
+	}
+
+	post, err := service.repository.GetPost(postID)
+	if err != nil {
+		return nil, err
+	}
+
+	post.CommentIDs = append(post.CommentIDs, newComment.ID)
+
+	_, err = service.repository.UpdatePost(postID, *post)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.GetPost(postID)
 }

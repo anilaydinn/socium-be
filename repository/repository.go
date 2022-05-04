@@ -33,8 +33,18 @@ type PostEntity struct {
 	Image           string    `bson:"image"`
 	IsPrivate       bool      `bson:"isPrivate"`
 	WhoLikesUserIDs []string  `bson:"whoLikesUserIds"`
+	CommentIDs      []string  `bson:"commentIds"`
 	CreatedAt       time.Time `bson:"createdAt"`
 	UpdatedAt       time.Time `bson:"updatedAt"`
+}
+
+type CommentEntity struct {
+	ID        string    `bson:"id"`
+	UserID    string    `bson:"userId"`
+	PostID    string    `bson:"postId"`
+	Content   string    `bson:"content"`
+	CreatedAt time.Time `bson:"createdAt"`
+	UpdatedAt time.Time `bson:"updatedAt"`
 }
 
 func NewRepository(uri string) *Repository {
@@ -248,6 +258,80 @@ func (repository *Repository) UpdatePost(postID string, post model.Post) (*model
 	return repository.GetPost(postID)
 }
 
+func (repository *Repository) AddComment(comment model.Comment) (*model.Comment, error) {
+	collection := repository.MongoClient.Database("socium").Collection("comments")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	commentEntity := convertCommentModelToCommentEntity(comment)
+
+	_, err := collection.InsertOne(ctx, commentEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.GetComment(commentEntity.ID)
+}
+
+func (repository *Repository) GetComment(commentID string) (*model.Comment, error) {
+	collection := repository.MongoClient.Database("socium").Collection("comments")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": commentID}
+
+	cur := collection.FindOne(ctx, filter)
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if cur == nil {
+		return nil, errors.PostNotFound
+	}
+
+	commentEntity := CommentEntity{}
+	err := cur.Decode(&commentEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	comment := convertCommentEntityToCommentModel(commentEntity)
+
+	return &comment, nil
+}
+
+func (repository *Repository) GetCommentsByIDList(commentIDs []string) ([]model.Comment, error) {
+	collection := repository.MongoClient.Database("socium").Collection("comments")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var filter bson.M
+	if len(commentIDs) == 0 {
+		filter = bson.M{"id": bson.M{"$in": []string{}}}
+	} else {
+		filter = bson.M{"id": bson.M{"$in": commentIDs}}
+	}
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var comments []model.Comment
+	for cur.Next(ctx) {
+		commentEntity := CommentEntity{}
+		err := cur.Decode(&commentEntity)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, convertCommentEntityToCommentModel(commentEntity))
+	}
+	return comments, nil
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:          user.ID,
@@ -280,6 +364,7 @@ func convertPostModelToPostEntity(post model.Post) PostEntity {
 		Image:           post.Image,
 		IsPrivate:       post.IsPrivate,
 		WhoLikesUserIDs: post.WhoLikesUserIDs,
+		CommentIDs:      post.CommentIDs,
 		CreatedAt:       post.CreatedAt,
 		UpdatedAt:       post.UpdatedAt,
 	}
@@ -293,7 +378,30 @@ func convertPostEntityToPostModel(postEntity PostEntity) model.Post {
 		Image:           postEntity.Image,
 		IsPrivate:       postEntity.IsPrivate,
 		WhoLikesUserIDs: postEntity.WhoLikesUserIDs,
+		CommentIDs:      postEntity.CommentIDs,
 		CreatedAt:       postEntity.CreatedAt,
 		UpdatedAt:       postEntity.UpdatedAt,
+	}
+}
+
+func convertCommentModelToCommentEntity(comment model.Comment) CommentEntity {
+	return CommentEntity{
+		ID:        comment.ID,
+		UserID:    comment.UserID,
+		PostID:    comment.PostID,
+		Content:   comment.Content,
+		CreatedAt: comment.CreatedAt,
+		UpdatedAt: comment.UpdatedAt,
+	}
+}
+
+func convertCommentEntityToCommentModel(commentEntity CommentEntity) model.Comment {
+	return model.Comment{
+		ID:        commentEntity.ID,
+		UserID:    commentEntity.UserID,
+		PostID:    commentEntity.PostID,
+		Content:   commentEntity.Content,
+		CreatedAt: commentEntity.CreatedAt,
+		UpdatedAt: commentEntity.UpdatedAt,
 	}
 }
