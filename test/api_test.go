@@ -860,13 +860,92 @@ func TestLikePost(t *testing.T) {
 				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
 			})
 
-			Convey("Then all public posts should return", func() {
+			Convey("Then user id should be inside the whoLikes array", func() {
 				actualResult := model.Post{}
 				httpResponseBody, _ := ioutil.ReadAll(res.Body)
 				err := json.Unmarshal(httpResponseBody, &actualResult)
 				So(err, ShouldBeNil)
 
 				So(actualResult.WhoLikesUserIDs, ShouldContain, registeredUser1.ID)
+			})
+		})
+	})
+}
+
+func TestLikeAlreadyLikedPost(t *testing.T) {
+	Convey("Given posts data", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser1 := model.User{
+			ID:          "3c0bbdae",
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		registeredUser2 := model.User{
+			ID:          utils.GenerateUUID(8),
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		testRepository.RegisterUser(registeredUser1)
+		testRepository.RegisterUser(registeredUser2)
+
+		testPost1 := model.Post{
+			ID:          utils.GenerateUUID(8),
+			UserID:      registeredUser2.ID,
+			User:        &registeredUser2,
+			Description: "Test Description 1",
+			Image:       "zcxçömzcxözcxzzçcmzö 1",
+			IsPrivate:   false,
+			WhoLikesUserIDs: []string{
+				"3c0bbdae",
+			},
+			CreatedAt: time.Now().UTC().Add(-5 * time.Minute).Round(time.Second),
+			UpdatedAt: time.Now().UTC().Add(-5 * time.Minute).Round(time.Second),
+		}
+		testRepository.CreatePost(testPost1)
+
+		Convey("When user send like posts request with userId", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
+
+			likePostDTO := model.LikePostDTO{
+				UserID: registeredUser1.ID,
+			}
+			reqBody, err := json.Marshal(likePostDTO)
+			So(err, ShouldBeNil)
+
+			req, err := http.NewRequest(http.MethodPatch, "/user/posts/"+testPost1.ID+"/like", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 200", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
+			})
+
+			Convey("Then user id should not be inside the whoLikes array", func() {
+				actualResult := model.Post{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult.WhoLikesUserIDs, ShouldHaveLength, 0)
+				So(actualResult.WhoLikesUserIDs, ShouldNotContain, registeredUser1.ID)
 			})
 		})
 	})

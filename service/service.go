@@ -199,7 +199,11 @@ func (service *Service) LikePost(postID string, likePostDTO model.LikePostDTO) (
 		return nil, errors.PostNotFound
 	}
 
-	post.WhoLikesUserIDs = append(post.WhoLikesUserIDs, likePostDTO.UserID)
+	if utils.Contains(post.WhoLikesUserIDs, likePostDTO.UserID) {
+		post.WhoLikesUserIDs = utils.RemoveElement(post.WhoLikesUserIDs, likePostDTO.UserID)
+	} else {
+		post.WhoLikesUserIDs = append(post.WhoLikesUserIDs, likePostDTO.UserID)
+	}
 
 	updatedPost, err := service.repository.UpdatePost(postID, *post)
 	if err != nil {
