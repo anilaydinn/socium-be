@@ -183,15 +183,23 @@ func (service *Service) GetPosts(userID string) ([]model.Post, error) {
 	}
 
 	for i, post := range posts {
-		user, err := service.repository.GetUser(post.UserID)
+		postUser, err := service.repository.GetUser(post.UserID)
 		if err != nil {
 			return nil, err
 		}
-		posts[i].User = user
+		posts[i].User = postUser
 
 		comments, err := service.repository.GetCommentsByIDList(post.CommentIDs)
 		if err != nil {
 			return nil, err
+		}
+
+		for j, comment := range comments {
+			commentUser, err := service.repository.GetUser(comment.UserID)
+			if err != nil {
+				return nil, err
+			}
+			comments[j].User = commentUser
 		}
 		posts[i].Comments = comments
 	}

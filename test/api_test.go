@@ -688,6 +688,8 @@ func TestGetUserPosts(t *testing.T) {
 
 		api.SetupApp(app)
 
+		commentID := utils.GenerateUUID(8)
+
 		registeredUser1 := model.User{
 			ID:          "3c0bbdae",
 			Name:        "James",
@@ -729,8 +731,11 @@ func TestGetUserPosts(t *testing.T) {
 			Image:           "zcxçömzcxözcxzzçcmzö 2",
 			IsPrivate:       false,
 			WhoLikesUserIDs: nil,
-			CreatedAt:       time.Now().UTC().Round(time.Second),
-			UpdatedAt:       time.Now().UTC().Round(time.Second),
+			CommentIDs: []string{
+				commentID,
+			},
+			CreatedAt: time.Now().UTC().Round(time.Second),
+			UpdatedAt: time.Now().UTC().Round(time.Second),
 		}
 		testPost3 := model.Post{
 			ID:              utils.GenerateUUID(8),
@@ -740,12 +745,25 @@ func TestGetUserPosts(t *testing.T) {
 			Image:           "zcxçömzcxözcxzzçcmzö 3",
 			IsPrivate:       true,
 			WhoLikesUserIDs: nil,
-			CreatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
-			UpdatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
+			CommentIDs: []string{
+				commentID,
+			},
+			CreatedAt: time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
+			UpdatedAt: time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
 		}
 		testRepository.CreatePost(testPost1)
 		testRepository.CreatePost(testPost2)
 		testRepository.CreatePost(testPost3)
+
+		testComment1 := model.Comment{
+			ID:        commentID,
+			UserID:    registeredUser2.ID,
+			PostID:    testPost1.ID,
+			Content:   "Comment",
+			CreatedAt: time.Now().UTC().Round(time.Second),
+			UpdatedAt: time.Now().UTC().Round(time.Second),
+		}
+		testRepository.AddComment(testComment1)
 
 		Convey("When user send get posts request with userId query", func() {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
@@ -776,6 +794,7 @@ func TestGetUserPosts(t *testing.T) {
 				So(actualResult[0].IsPrivate, ShouldEqual, testPost2.IsPrivate)
 				So(actualResult[0].WhoLikesUserIDs, ShouldEqual, testPost2.WhoLikesUserIDs)
 				So(actualResult[0].User, ShouldResemble, &registeredUser2)
+				So(actualResult[0].Comments[0].Content, ShouldEqual, testComment1.Content)
 				So(actualResult[0].IsPrivate, ShouldBeFalse)
 				So(actualResult[0].CreatedAt, ShouldEqual, testPost2.CreatedAt)
 				So(actualResult[0].UpdatedAt, ShouldEqual, testPost2.UpdatedAt)
@@ -788,6 +807,7 @@ func TestGetUserPosts(t *testing.T) {
 				So(actualResult[1].IsPrivate, ShouldEqual, testPost3.IsPrivate)
 				So(actualResult[1].WhoLikesUserIDs, ShouldEqual, testPost3.WhoLikesUserIDs)
 				So(actualResult[1].User, ShouldResemble, &registeredUser2)
+				So(actualResult[1].Comments[0].Content, ShouldEqual, testComment1.Content)
 				So(actualResult[1].IsPrivate, ShouldBeTrue)
 				So(actualResult[1].CreatedAt, ShouldEqual, testPost3.CreatedAt)
 				So(actualResult[1].UpdatedAt, ShouldEqual, testPost3.UpdatedAt)
