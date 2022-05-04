@@ -43,6 +43,8 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 		Password:    string(hashedPassword),
 		UserType:    "user",
 		IsActivated: false,
+		CreatedAt:   time.Now().UTC().Round(time.Minute),
+		UpdatedAt:   time.Now().UTC().Round(time.Minute),
 	}
 
 	newUser, err := service.repository.RegisterUser(user)

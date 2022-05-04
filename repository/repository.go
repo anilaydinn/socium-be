@@ -17,13 +17,15 @@ type Repository struct {
 }
 
 type UserEntity struct {
-	ID          string `bson:"id"`
-	Name        string `bson:"name"`
-	Surname     string `bson:"surname"`
-	Email       string `bson:"email"`
-	Password    string `bson:"password"`
-	UserType    string `bson:"userType"`
-	IsActivated bool   `bson:"isActivated"`
+	ID          string    `bson:"id"`
+	Name        string    `bson:"name"`
+	Surname     string    `bson:"surname"`
+	Email       string    `bson:"email"`
+	Password    string    `bson:"password"`
+	UserType    string    `bson:"userType"`
+	IsActivated bool      `bson:"isActivated"`
+	CreatedAt   time.Time `bson:"createdAt"`
+	UpdatedAt   time.Time `bson:"updatedAt"`
 }
 
 type PostEntity struct {
@@ -341,6 +343,8 @@ func convertUserModelToUserEntity(user model.User) UserEntity {
 		Password:    user.Password,
 		UserType:    user.UserType,
 		IsActivated: user.IsActivated,
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
 	}
 }
 
@@ -353,6 +357,8 @@ func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 		Password:    userEntity.Password,
 		UserType:    userEntity.UserType,
 		IsActivated: userEntity.IsActivated,
+		CreatedAt:   userEntity.CreatedAt,
+		UpdatedAt:   userEntity.UpdatedAt,
 	}
 }
 

@@ -65,6 +65,8 @@ func TestRegisterUser(t *testing.T) {
 				So(actualResult.Email, ShouldEqual, userDTO.Email)
 				So(actualResult.UserType, ShouldEqual, "user")
 				So(actualResult.IsActivated, ShouldBeFalse)
+				So(actualResult.CreatedAt, ShouldEqual, time.Now().UTC().Round(time.Minute))
+				So(actualResult.UpdatedAt, ShouldEqual, time.Now().UTC().Round(time.Minute))
 			})
 		})
 	})

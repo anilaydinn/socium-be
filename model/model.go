@@ -6,13 +6,15 @@ import (
 )
 
 type User struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Surname     string `json:"surname"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	UserType    string `json:"userType"`
-	IsActivated bool   `json:"isActivated"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Surname     string    `json:"surname"`
+	Email       string    `json:"email"`
+	Password    string    `json:"password"`
+	UserType    string    `json:"userType"`
+	IsActivated bool      `json:"isActivated"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type UserDTO struct {
