@@ -40,6 +40,7 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 		Name:        userDTO.Name,
 		Surname:     userDTO.Surname,
 		Email:       userDTO.Email,
+		BirthDate:   userDTO.BirthDate,
 		Password:    string(hashedPassword),
 		UserType:    "user",
 		IsActivated: false,

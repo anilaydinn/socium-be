@@ -33,10 +33,11 @@ func TestRegisterUser(t *testing.T) {
 
 		Convey("When add user request sent", func() {
 			userDTO := model.UserDTO{
-				Name:     "John",
-				Surname:  "Obama",
-				Email:    "john@gmail.com",
-				Password: "123123",
+				Name:      "John",
+				Surname:   "Obama",
+				Email:     "john@gmail.com",
+				BirthDate: time.Date(1998, 3, 16, 0, 0, 0, 0, time.Local),
+				Password:  "123123",
 			}
 
 			reqBody, err := json.Marshal(userDTO)
@@ -63,6 +64,7 @@ func TestRegisterUser(t *testing.T) {
 				So(actualResult.Name, ShouldEqual, userDTO.Name)
 				So(actualResult.Surname, ShouldEqual, userDTO.Surname)
 				So(actualResult.Email, ShouldEqual, userDTO.Email)
+				So(actualResult.BirthDate, ShouldEqual, userDTO.BirthDate)
 				So(actualResult.UserType, ShouldEqual, "user")
 				So(actualResult.IsActivated, ShouldBeFalse)
 				So(actualResult.CreatedAt, ShouldEqual, time.Now().UTC().Round(time.Minute))

@@ -10,6 +10,7 @@ type User struct {
 	Name        string    `json:"name"`
 	Surname     string    `json:"surname"`
 	Email       string    `json:"email"`
+	BirthDate   time.Time `json:"birthDate"`
 	Password    string    `json:"password"`
 	UserType    string    `json:"userType"`
 	IsActivated bool      `json:"isActivated"`
@@ -18,10 +19,11 @@ type User struct {
 }
 
 type UserDTO struct {
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name      string    `json:"name"`
+	Surname   string    `json:"surname"`
+	Email     string    `json:"email"`
+	BirthDate time.Time `json:"birthDate"`
+	Password  string    `json:"password"`
 }
 
 type UserCredentialsDTO struct {

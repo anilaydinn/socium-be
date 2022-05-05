@@ -21,6 +21,7 @@ type UserEntity struct {
 	Name        string    `bson:"name"`
 	Surname     string    `bson:"surname"`
 	Email       string    `bson:"email"`
+	BirthDate   time.Time `bson:"birthDate"`
 	Password    string    `bson:"password"`
 	UserType    string    `bson:"userType"`
 	IsActivated bool      `bson:"isActivated"`
@@ -340,6 +341,7 @@ func convertUserModelToUserEntity(user model.User) UserEntity {
 		Name:        user.Name,
 		Surname:     user.Surname,
 		Email:       user.Email,
+		BirthDate:   user.BirthDate,
 		Password:    user.Password,
 		UserType:    user.UserType,
 		IsActivated: user.IsActivated,
@@ -354,6 +356,7 @@ func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 		Name:        userEntity.Name,
 		Surname:     userEntity.Surname,
 		Email:       userEntity.Email,
+		BirthDate:   userEntity.BirthDate,
 		Password:    userEntity.Password,
 		UserType:    userEntity.UserType,
 		IsActivated: userEntity.IsActivated,
