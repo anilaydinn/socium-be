@@ -6,16 +6,18 @@ import (
 )
 
 type User struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Surname     string    `json:"surname"`
-	Email       string    `json:"email"`
-	BirthDate   time.Time `json:"birthDate"`
-	Password    string    `json:"password"`
-	UserType    string    `json:"userType"`
-	IsActivated bool      `json:"isActivated"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Surname      string    `json:"surname"`
+	Email        string    `json:"email"`
+	BirthDate    time.Time `json:"birthDate"`
+	Description  string    `json:"description"`
+	ProfileImage string    `json:"profileImage"`
+	Password     string    `json:"password"`
+	UserType     string    `json:"userType"`
+	IsActivated  bool      `json:"isActivated"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
 type UserDTO struct {
@@ -29,6 +31,11 @@ type UserDTO struct {
 type UserCredentialsDTO struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type UpdateUserDTO struct {
+	Description  string `json:"description"`
+	ProfileImage string `json:"profileImage"`
 }
 
 type ForgotPasswordDTO struct {

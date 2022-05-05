@@ -41,6 +41,7 @@ func Contains(s []string, str string) bool {
 
 	return false
 }
+
 func RemoveElement(s []string, id string) []string {
 	index := linearSearch(s, id)
 

@@ -22,6 +22,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Get("/user/posts", api.GetPostsHandler)
 	app.Patch("/user/posts/:postID/like", api.LikePostHandler)
 	app.Post("/user/posts/:postID/comments", api.AddPostCommentHandler)
+	app.Patch("/user/users/:userID", api.UpdateUserHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -234,6 +235,28 @@ func (api *API) AddPostCommentHandler(c *fiber.Ctx) error {
 	case nil:
 		c.Status(fiber.StatusCreated)
 		c.JSON(post)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) UpdateUserHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+	updateUserDTO := model.UpdateUserDTO{}
+	err := c.BodyParser(&updateUserDTO)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	updatedUser, err := api.service.UpdateUser(userID, updateUserDTO)
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(updatedUser)
+	case errors.UserNotFound:
+		c.Status(fiber.StatusNotFound)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

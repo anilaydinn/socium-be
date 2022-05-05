@@ -276,3 +276,19 @@ func (service *Service) AddPostComment(postID string, commentDTO model.CommentDT
 
 	return service.GetPost(postID)
 }
+
+func (service *Service) UpdateUser(userID string, updateUserDTO model.UpdateUserDTO) (*model.User, error) {
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+	user.Description = updateUserDTO.Description
+	user.ProfileImage = updateUserDTO.ProfileImage
+
+	updatedUser, err := service.repository.UpdateUser(userID, *user)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
+}
