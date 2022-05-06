@@ -17,18 +17,19 @@ type Repository struct {
 }
 
 type UserEntity struct {
-	ID           string    `bson:"id"`
-	Name         string    `bson:"name"`
-	Surname      string    `bson:"surname"`
-	Email        string    `bson:"email"`
-	BirthDate    time.Time `bson:"birthDate"`
-	Description  string    `bson:"description"`
-	ProfileImage string    `bson:"profileImage"`
-	Password     string    `bson:"password"`
-	UserType     string    `bson:"userType"`
-	IsActivated  bool      `bson:"isActivated"`
-	CreatedAt    time.Time `bson:"createdAt"`
-	UpdatedAt    time.Time `bson:"updatedAt"`
+	ID                   string    `bson:"id"`
+	Name                 string    `bson:"name"`
+	Surname              string    `bson:"surname"`
+	Email                string    `bson:"email"`
+	BirthDate            time.Time `bson:"birthDate"`
+	Description          string    `bson:"description"`
+	ProfileImage         string    `bson:"profileImage"`
+	FriendRequestUserIDs []string  `bson:"friendRequestUserIDs"`
+	Password             string    `bson:"password"`
+	UserType             string    `bson:"userType"`
+	IsActivated          bool      `bson:"isActivated"`
+	CreatedAt            time.Time `bson:"createdAt"`
+	UpdatedAt            time.Time `bson:"updatedAt"`
 }
 
 type PostEntity struct {
@@ -339,35 +340,37 @@ func (repository *Repository) GetCommentsByIDList(commentIDs []string) ([]model.
 
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
-		ID:           user.ID,
-		Name:         user.Name,
-		Surname:      user.Surname,
-		Email:        user.Email,
-		BirthDate:    user.BirthDate,
-		Description:  user.Description,
-		ProfileImage: user.ProfileImage,
-		Password:     user.Password,
-		UserType:     user.UserType,
-		IsActivated:  user.IsActivated,
-		CreatedAt:    user.CreatedAt,
-		UpdatedAt:    user.UpdatedAt,
+		ID:                   user.ID,
+		Name:                 user.Name,
+		Surname:              user.Surname,
+		Email:                user.Email,
+		BirthDate:            user.BirthDate,
+		Description:          user.Description,
+		ProfileImage:         user.ProfileImage,
+		FriendRequestUserIDs: user.FriendRequestUserIDs,
+		Password:             user.Password,
+		UserType:             user.UserType,
+		IsActivated:          user.IsActivated,
+		CreatedAt:            user.CreatedAt,
+		UpdatedAt:            user.UpdatedAt,
 	}
 }
 
 func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 	return model.User{
-		ID:           userEntity.ID,
-		Name:         userEntity.Name,
-		Surname:      userEntity.Surname,
-		Email:        userEntity.Email,
-		BirthDate:    userEntity.BirthDate,
-		Description:  userEntity.Description,
-		ProfileImage: userEntity.ProfileImage,
-		Password:     userEntity.Password,
-		UserType:     userEntity.UserType,
-		IsActivated:  userEntity.IsActivated,
-		CreatedAt:    userEntity.CreatedAt,
-		UpdatedAt:    userEntity.UpdatedAt,
+		ID:                   userEntity.ID,
+		Name:                 userEntity.Name,
+		Surname:              userEntity.Surname,
+		Email:                userEntity.Email,
+		BirthDate:            userEntity.BirthDate,
+		Description:          userEntity.Description,
+		ProfileImage:         userEntity.ProfileImage,
+		FriendRequestUserIDs: userEntity.FriendRequestUserIDs,
+		Password:             userEntity.Password,
+		UserType:             userEntity.UserType,
+		IsActivated:          userEntity.IsActivated,
+		CreatedAt:            userEntity.CreatedAt,
+		UpdatedAt:            userEntity.UpdatedAt,
 	}
 }
 

@@ -292,3 +292,18 @@ func (service *Service) UpdateUser(userID string, updateUserDTO model.UpdateUser
 
 	return updatedUser, nil
 }
+
+func (service *Service) SendFriendRequest(targetUserID string, friendRequestDTO model.FriendRequestDTO) (*model.User, error) {
+	user, err := service.GetUser(targetUserID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+	user.FriendRequestUserIDs = append(user.FriendRequestUserIDs, friendRequestDTO.UserID)
+
+	updatedUser, err := service.repository.UpdateUser(targetUserID, *user)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
+}
