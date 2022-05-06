@@ -24,6 +24,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/user/posts/:postID/comments", api.AddPostCommentHandler)
 	app.Patch("/user/users/:userID", api.UpdateUserHandler)
 	app.Post("/user/users/:targetUserID/friendRequests", api.SendFriendRequestHandler)
+	app.Get("/user/users/:userID/friendRequests", api.GetUserFriendRequestsHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -282,6 +283,20 @@ func (api *API) SendFriendRequestHandler(c *fiber.Ctx) error {
 	default:
 		c.Status(fiber.StatusInternalServerError)
 
+	}
+	return nil
+}
+
+func (api *API) GetUserFriendRequestsHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+	users, err := api.service.GetUserFriendRequests(userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(users)
+	default:
+		c.Status(fiber.StatusInternalServerError)
 	}
 	return nil
 }

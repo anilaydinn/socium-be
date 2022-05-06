@@ -307,3 +307,17 @@ func (service *Service) SendFriendRequest(targetUserID string, friendRequestDTO 
 
 	return updatedUser, nil
 }
+
+func (service *Service) GetUserFriendRequests(userID string) ([]model.User, error) {
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+
+	friendRequestUsers, err := service.repository.GetUsersByIDList(user.FriendRequestUserIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return friendRequestUsers, nil
+}

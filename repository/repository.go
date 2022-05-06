@@ -338,6 +338,35 @@ func (repository *Repository) GetCommentsByIDList(commentIDs []string) ([]model.
 	return comments, nil
 }
 
+func (repository *Repository) GetUsersByIDList(userIDs []string) ([]model.User, error) {
+	collection := repository.MongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var filter bson.M
+	if len(userIDs) == 0 {
+		filter = bson.M{"id": bson.M{"$in": []string{}}}
+	} else {
+		filter = bson.M{"id": bson.M{"$in": userIDs}}
+	}
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []model.User
+	for cur.Next(ctx) {
+		userEntity := UserEntity{}
+		err := cur.Decode(&userEntity)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, convertUserEntityToUserModel(userEntity))
+	}
+	return users, nil
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:                   user.ID,

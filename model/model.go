@@ -51,6 +51,10 @@ type FriendRequestDTO struct {
 	UserID string `json:"userId"`
 }
 
+type FriendRequestIDsDTO struct {
+	UserIDs []string `json:"userIds"`
+}
+
 type PostDTO struct {
 	UserID      string `json:"userId"`
 	Description string `json:"description"`
