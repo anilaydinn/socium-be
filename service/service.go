@@ -342,3 +342,17 @@ func (service *Service) AcceptOrDeclineUserFriendRequest(userID, targetID string
 
 	return updatedUser, nil
 }
+
+func (service *Service) GetUserFriends(userID string) ([]model.User, error) {
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+
+	friends, err := service.repository.GetUsersByIDList(user.FriendIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return friends, nil
+}

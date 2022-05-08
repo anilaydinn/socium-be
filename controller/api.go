@@ -26,6 +26,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/user/users/:targetUserID/friendRequests", api.SendFriendRequestHandler)
 	app.Get("/user/users/:userID/friendRequests", api.GetUserFriendRequestsHandler)
 	app.Post("/user/users/:userID/friendRequests/:targetID", api.AcceptOrDeclineUserFriendRequestHandler)
+	app.Get("/user/users/:userID/friends", api.GetUserFriendsHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -317,6 +318,23 @@ func (api *API) AcceptOrDeclineUserFriendRequestHandler(c *fiber.Ctx) error {
 	case nil:
 		c.Status(fiber.StatusOK)
 		c.JSON(user)
+	case errors.UserNotFound:
+		c.Status(fiber.StatusNotFound)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) GetUserFriendsHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+
+	friends, err := api.service.GetUserFriends(userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(friends)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}
