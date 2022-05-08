@@ -14,6 +14,7 @@ type User struct {
 	Description          string    `json:"description"`
 	ProfileImage         string    `json:"profileImage"`
 	FriendRequestUserIDs []string  `json:"friendRequestUserIDs"`
+	FriendIDs            []string  `json:"friendIds"`
 	Password             string    `json:"password"`
 	UserType             string    `json:"userType"`
 	IsActivated          bool      `json:"isActivated"`
@@ -53,6 +54,10 @@ type FriendRequestDTO struct {
 
 type FriendRequestIDsDTO struct {
 	UserIDs []string `json:"userIds"`
+}
+
+type AcceptOrDeclineFriendRequestDTO struct {
+	Accept bool `json:"accept"`
 }
 
 type PostDTO struct {

@@ -321,3 +321,24 @@ func (service *Service) GetUserFriendRequests(userID string) ([]model.User, erro
 
 	return friendRequestUsers, nil
 }
+
+func (service *Service) AcceptOrDeclineUserFriendRequest(userID, targetID string, acceptOrDeclineFriendRequestDTO model.AcceptOrDeclineFriendRequestDTO) (*model.User, error) {
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+
+	if acceptOrDeclineFriendRequestDTO.Accept {
+		user.FriendIDs = append(user.FriendIDs, targetID)
+		user.FriendRequestUserIDs = utils.RemoveElement(user.FriendRequestUserIDs, targetID)
+	} else {
+		user.FriendRequestUserIDs = utils.RemoveElement(user.FriendRequestUserIDs, targetID)
+	}
+
+	updatedUser, err := service.repository.UpdateUser(userID, *user)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
+}

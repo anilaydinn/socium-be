@@ -25,6 +25,7 @@ type UserEntity struct {
 	Description          string    `bson:"description"`
 	ProfileImage         string    `bson:"profileImage"`
 	FriendRequestUserIDs []string  `bson:"friendRequestUserIDs"`
+	FriendIDs            []string  `json:"friendIds"`
 	Password             string    `bson:"password"`
 	UserType             string    `bson:"userType"`
 	IsActivated          bool      `bson:"isActivated"`
@@ -377,6 +378,7 @@ func convertUserModelToUserEntity(user model.User) UserEntity {
 		Description:          user.Description,
 		ProfileImage:         user.ProfileImage,
 		FriendRequestUserIDs: user.FriendRequestUserIDs,
+		FriendIDs:            user.FriendIDs,
 		Password:             user.Password,
 		UserType:             user.UserType,
 		IsActivated:          user.IsActivated,
@@ -395,6 +397,7 @@ func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 		Description:          userEntity.Description,
 		ProfileImage:         userEntity.ProfileImage,
 		FriendRequestUserIDs: userEntity.FriendRequestUserIDs,
+		FriendIDs:            userEntity.FriendIDs,
 		Password:             userEntity.Password,
 		UserType:             userEntity.UserType,
 		IsActivated:          userEntity.IsActivated,
