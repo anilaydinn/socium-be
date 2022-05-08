@@ -1308,6 +1308,73 @@ func TestAcceptFriendRequest(t *testing.T) {
 	})
 }
 
+func TestDeclineFriendRequest(t *testing.T) {
+	Convey("Given registered users", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser1 := model.User{
+			ID:                   "3c0bbdae",
+			Name:                 "James",
+			Surname:              "Bond",
+			Email:                "test@gmail.com",
+			Password:             "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			FriendRequestUserIDs: []string{"123123"},
+			FriendIDs:            []string{},
+			UserType:             "user",
+			IsActivated:          true,
+		}
+
+		registeredUser2 := model.User{
+			ID:          "123123",
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		testRepository.RegisterUser(registeredUser1)
+		testRepository.RegisterUser(registeredUser2)
+
+		Convey("When user send accept friend request with user id", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
+
+			acceptFriendRequestDTO := model.AcceptOrDeclineFriendRequestDTO{
+				Accept: false,
+			}
+			reqBody, err := json.Marshal(acceptFriendRequestDTO)
+			So(err, ShouldBeNil)
+
+			req, err := http.NewRequest(http.MethodPost, "/user/users/"+registeredUser1.ID+"/friendRequests/123123", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 200", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
+			})
+
+			Convey("Then new friend should be added to user friends array", func() {
+				actualResult := model.User{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult.ID, ShouldEqual, registeredUser1.ID)
+				So(actualResult.FriendRequestUserIDs, ShouldHaveLength, 0)
+			})
+		})
+	})
+}
+
 func GetCleanTestRepository() *repository.Repository {
 	repository := repository.NewRepository("mongodb://localhost:27017")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
