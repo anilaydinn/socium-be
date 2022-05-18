@@ -38,6 +38,8 @@ func TestRegisterUser(t *testing.T) {
 				Email:     "john@gmail.com",
 				BirthDate: time.Date(1998, 3, 16, 0, 0, 0, 0, time.Local),
 				Password:  "123123",
+				Latitude:  41.3843848,
+				Longitude: 26.8328428,
 			}
 
 			reqBody, err := json.Marshal(userDTO)
@@ -69,6 +71,8 @@ func TestRegisterUser(t *testing.T) {
 				So(actualResult.IsActivated, ShouldBeFalse)
 				So(actualResult.CreatedAt, ShouldEqual, time.Now().UTC().Round(time.Minute))
 				So(actualResult.UpdatedAt, ShouldEqual, time.Now().UTC().Round(time.Minute))
+				So(actualResult.Latitude, ShouldEqual, userDTO.Latitude)
+				So(actualResult.Longitude, ShouldEqual, userDTO.Longitude)
 			})
 		})
 	})

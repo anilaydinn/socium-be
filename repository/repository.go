@@ -31,6 +31,8 @@ type UserEntity struct {
 	IsActivated          bool      `bson:"isActivated"`
 	CreatedAt            time.Time `bson:"createdAt"`
 	UpdatedAt            time.Time `bson:"updatedAt"`
+	Latitude             float64   `bson:"latitude"`
+	Longitude            float64   `bson:"longitude"`
 }
 
 type PostEntity struct {
@@ -384,6 +386,8 @@ func convertUserModelToUserEntity(user model.User) UserEntity {
 		IsActivated:          user.IsActivated,
 		CreatedAt:            user.CreatedAt,
 		UpdatedAt:            user.UpdatedAt,
+		Latitude:             user.Latitude,
+		Longitude:            user.Longitude,
 	}
 }
 
@@ -403,6 +407,8 @@ func convertUserEntityToUserModel(userEntity UserEntity) model.User {
 		IsActivated:          userEntity.IsActivated,
 		CreatedAt:            userEntity.CreatedAt,
 		UpdatedAt:            userEntity.UpdatedAt,
+		Latitude:             userEntity.Latitude,
+		Longitude:            userEntity.Longitude,
 	}
 }
 

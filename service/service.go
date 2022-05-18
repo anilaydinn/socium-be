@@ -46,6 +46,8 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 		IsActivated: false,
 		CreatedAt:   time.Now().UTC().Round(time.Minute),
 		UpdatedAt:   time.Now().UTC().Round(time.Minute),
+		Latitude:    userDTO.Latitude,
+		Longitude:   userDTO.Longitude,
 	}
 
 	newUser, err := service.repository.RegisterUser(user)

@@ -20,6 +20,8 @@ type User struct {
 	IsActivated          bool      `json:"isActivated"`
 	CreatedAt            time.Time `json:"createdAt"`
 	UpdatedAt            time.Time `json:"updatedAt"`
+	Latitude             float64   `json:"latitude"`
+	Longitude            float64   `json:"longitude"`
 }
 
 type UserDTO struct {
@@ -28,6 +30,8 @@ type UserDTO struct {
 	Email     string    `json:"email"`
 	BirthDate time.Time `json:"birthDate"`
 	Password  string    `json:"password"`
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
 }
 
 type UserCredentialsDTO struct {
