@@ -181,8 +181,8 @@ func (service *Service) CreatePost(postDTO model.PostDTO) (*model.Post, error) {
 	return service.repository.CreatePost(post)
 }
 
-func (service *Service) GetPosts(userID string) ([]model.Post, error) {
-	posts, err := service.repository.GetPosts(userID)
+func (service *Service) GetPosts(userID string, friendIDs []string) ([]model.Post, error) {
+	posts, err := service.repository.GetPosts(userID, friendIDs)
 	if err != nil {
 		return nil, err
 	}

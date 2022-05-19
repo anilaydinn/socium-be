@@ -572,10 +572,21 @@ func TestGetAllPosts(t *testing.T) {
 			Surname:     "Bond",
 			Email:       "test@gmail.com",
 			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			FriendIDs:   []string{"2dbbds32"},
 			UserType:    "user",
 			IsActivated: true,
 		}
 		registeredUser2 := model.User{
+			ID:          "2dbbds32",
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			FriendIDs:   []string{"3c0bbdae"},
+			UserType:    "user",
+			IsActivated: true,
+		}
+		registeredUser3 := model.User{
 			ID:          utils.GenerateUUID(8),
 			Name:        "James",
 			Surname:     "Bond",
@@ -586,6 +597,7 @@ func TestGetAllPosts(t *testing.T) {
 		}
 		testRepository.RegisterUser(registeredUser1)
 		testRepository.RegisterUser(registeredUser2)
+		testRepository.RegisterUser(registeredUser3)
 
 		testPost1 := model.Post{
 			ID:              utils.GenerateUUID(8),
@@ -616,7 +628,18 @@ func TestGetAllPosts(t *testing.T) {
 			User:            &registeredUser2,
 			Description:     "Test Description 3",
 			Image:           "zcxçömzcxözcxzzçcmzö 3",
-			IsPrivate:       true,
+			IsPrivate:       false,
+			WhoLikesUserIDs: nil,
+			CreatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
+			UpdatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
+		}
+		testPost4 := model.Post{
+			ID:              utils.GenerateUUID(8),
+			UserID:          registeredUser3.ID,
+			User:            &registeredUser3,
+			Description:     "Test Description 4",
+			Image:           "zcxçömzcxözcxzzçcmzö 4",
+			IsPrivate:       false,
 			WhoLikesUserIDs: nil,
 			CreatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
 			UpdatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
@@ -624,11 +647,18 @@ func TestGetAllPosts(t *testing.T) {
 		testRepository.CreatePost(testPost1)
 		testRepository.CreatePost(testPost2)
 		testRepository.CreatePost(testPost3)
+		testRepository.CreatePost(testPost4)
 
 		Convey("When user send get posts request", func() {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
 
-			req, err := http.NewRequest(http.MethodGet, "/user/posts", nil)
+			getFriendPostsDTO := model.GetFriendPostsDTO{
+				FriendIDs: []string{"2dbbds32"},
+			}
+			reqBody, err := json.Marshal(getFriendPostsDTO)
+			So(err, ShouldBeNil)
+
+			req, err := http.NewRequest(http.MethodGet, "/user/posts", bytes.NewReader(reqBody))
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Add("Authorization", bearerToken)
 
@@ -666,7 +696,7 @@ func TestGetAllPosts(t *testing.T) {
 				So(actualResult[1].IsPrivate, ShouldEqual, testPost3.IsPrivate)
 				So(actualResult[1].WhoLikesUserIDs, ShouldEqual, testPost3.WhoLikesUserIDs)
 				So(actualResult[1].User, ShouldResemble, &registeredUser2)
-				So(actualResult[1].IsPrivate, ShouldBeTrue)
+				So(actualResult[1].IsPrivate, ShouldBeFalse)
 				So(actualResult[1].CreatedAt, ShouldEqual, testPost3.CreatedAt)
 				So(actualResult[1].UpdatedAt, ShouldEqual, testPost3.UpdatedAt)
 

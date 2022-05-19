@@ -104,6 +104,10 @@ type LikePostDTO struct {
 	UserID string `json:"userId"`
 }
 
+type GetFriendPostsDTO struct {
+	FriendIDs []string `json:"friendIds"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }
