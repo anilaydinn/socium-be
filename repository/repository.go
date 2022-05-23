@@ -56,6 +56,14 @@ type CommentEntity struct {
 	UpdatedAt time.Time `bson:"updatedAt"`
 }
 
+type ContactEntity struct {
+	ID      string `bson:"id"`
+	Name    string `bson:"name"`
+	Surname string `bson:"surname"`
+	Email   string `bson:"email"`
+	Message string `bson:"message"`
+}
+
 func NewRepository(uri string) *Repository {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
@@ -370,6 +378,51 @@ func (repository *Repository) GetUsersByIDList(userIDs []string) ([]model.User, 
 	return users, nil
 }
 
+func (repository *Repository) CreateContact(contact model.Contact) (*model.Contact, error) {
+	collection := repository.MongoClient.Database("socium").Collection("contacts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	contactEntity := convertContactModelToContactEntity(contact)
+
+	_, err := collection.InsertOne(ctx, contactEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.GetContact(contactEntity.ID)
+}
+
+func (repository *Repository) GetContact(contactID string) (*model.Contact, error) {
+	collection := repository.MongoClient.Database("socium").Collection("contacts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": contactID}
+
+	cur := collection.FindOne(ctx, filter)
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if cur == nil {
+		return nil, errors.ContactNotFound
+	}
+
+	contactEntity := ContactEntity{}
+	err := cur.Decode(&contactEntity)
+
+	if err != nil {
+		return nil, err
+	}
+
+	contact := convertContactEntityToContactModel(contactEntity)
+
+	return &contact, nil
+}
+
 func convertUserModelToUserEntity(user model.User) UserEntity {
 	return UserEntity{
 		ID:                   user.ID,
@@ -459,5 +512,25 @@ func convertCommentEntityToCommentModel(commentEntity CommentEntity) model.Comme
 		Content:   commentEntity.Content,
 		CreatedAt: commentEntity.CreatedAt,
 		UpdatedAt: commentEntity.UpdatedAt,
+	}
+}
+
+func convertContactModelToContactEntity(contact model.Contact) ContactEntity {
+	return ContactEntity{
+		ID:      contact.ID,
+		Name:    contact.Name,
+		Surname: contact.Surname,
+		Email:   contact.Email,
+		Message: contact.Message,
+	}
+}
+
+func convertContactEntityToContactModel(contactEntity ContactEntity) model.Contact {
+	return model.Contact{
+		ID:      contactEntity.ID,
+		Name:    contactEntity.Name,
+		Surname: contactEntity.Surname,
+		Email:   contactEntity.Email,
+		Message: contactEntity.Message,
 	}
 }

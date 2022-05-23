@@ -1494,6 +1494,52 @@ func TestGetUserFriends(t *testing.T) {
 	})
 }
 
+func TestCreateContact(t *testing.T) {
+	Convey("Given guest user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		Convey("When user send contact information request", func() {
+			contactDTO := model.ContactDTO{
+				Name:    "Test",
+				Surname: "Surname",
+				Email:   "testsurname@yopmail.com",
+				Message: "Hello",
+			}
+			reqBody, err := json.Marshal(contactDTO)
+			So(err, ShouldBeNil)
+
+			req, err := http.NewRequest(http.MethodPost, "/api/contacts", bytes.NewReader(reqBody))
+			req.Header.Add("Content-Type", "application/json")
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 201", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusCreated)
+			})
+
+			Convey("Then newly contact information should return", func() {
+				actualResult := model.Contact{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult.ID, ShouldNotBeNil)
+				So(actualResult.Name, ShouldEqual, contactDTO.Name)
+				So(actualResult.Surname, ShouldEqual, contactDTO.Surname)
+				So(actualResult.Email, ShouldEqual, contactDTO.Email)
+				So(actualResult.Message, ShouldEqual, contactDTO.Message)
+			})
+		})
+	})
+}
+
 func GetCleanTestRepository() *repository.Repository {
 	repository := repository.NewRepository("mongodb://localhost:27017")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
