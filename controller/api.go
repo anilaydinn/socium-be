@@ -191,11 +191,7 @@ func (api *API) CreatePostHandler(c *fiber.Ctx) error {
 func (api *API) GetPostsHandler(c *fiber.Ctx) error {
 	userID := c.Query("userId")
 	getFriendPostsDTO := model.GetFriendPostsDTO{}
-	err := c.BodyParser(&getFriendPostsDTO)
-	if err != nil {
-		c.Status(fiber.StatusBadRequest)
-		return nil
-	}
+	_ = c.BodyParser(&getFriendPostsDTO)
 
 	posts, err := api.service.GetPosts(userID, getFriendPostsDTO.FriendIDs)
 
