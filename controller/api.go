@@ -193,7 +193,7 @@ func (api *API) GetPostsHandler(c *fiber.Ctx) error {
 	getFriendPostsDTO := model.GetFriendPostsDTO{}
 	_ = c.BodyParser(&getFriendPostsDTO)
 
-	posts, err := api.service.GetPosts(userID, getFriendPostsDTO.FriendIDs)
+	posts, err := api.service.GetPosts(userID, getFriendPostsDTO)
 
 	switch err {
 	case nil:

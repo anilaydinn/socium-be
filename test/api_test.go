@@ -644,15 +644,28 @@ func TestGetAllPosts(t *testing.T) {
 			CreatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
 			UpdatedAt:       time.Now().UTC().Add(-3 * time.Minute).Round(time.Second),
 		}
+		testPost5 := model.Post{
+			ID:              utils.GenerateUUID(8),
+			UserID:          registeredUser1.ID,
+			User:            &registeredUser1,
+			Description:     "Test Description 4",
+			Image:           "zcxçömzcxözcxzzçcmzö 4",
+			IsPrivate:       false,
+			WhoLikesUserIDs: nil,
+			CreatedAt:       time.Now().UTC().Add(-2 * time.Minute).Round(time.Second),
+			UpdatedAt:       time.Now().UTC().Add(-2 * time.Minute).Round(time.Second),
+		}
 		testRepository.CreatePost(testPost1)
 		testRepository.CreatePost(testPost2)
 		testRepository.CreatePost(testPost3)
 		testRepository.CreatePost(testPost4)
+		testRepository.CreatePost(testPost5)
 
 		Convey("When user send get posts request", func() {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
 
 			getFriendPostsDTO := model.GetFriendPostsDTO{
+				UserID:    registeredUser1.ID,
 				FriendIDs: []string{"2dbbds32"},
 			}
 			reqBody, err := json.Marshal(getFriendPostsDTO)
@@ -675,7 +688,7 @@ func TestGetAllPosts(t *testing.T) {
 				err := json.Unmarshal(httpResponseBody, &actualResult)
 				So(err, ShouldBeNil)
 
-				So(actualResult, ShouldHaveLength, 3)
+				So(actualResult, ShouldHaveLength, 4)
 				So(actualResult[0].ID, ShouldNotBeNil)
 				So(actualResult[0].ID, ShouldEqual, testPost2.ID)
 				So(actualResult[0].UserID, ShouldEqual, registeredUser2.ID)
@@ -689,28 +702,40 @@ func TestGetAllPosts(t *testing.T) {
 				So(actualResult[0].UpdatedAt, ShouldEqual, testPost2.UpdatedAt)
 
 				So(actualResult[1].ID, ShouldNotBeNil)
-				So(actualResult[1].ID, ShouldEqual, testPost3.ID)
-				So(actualResult[1].UserID, ShouldEqual, registeredUser2.ID)
-				So(actualResult[1].Description, ShouldEqual, testPost3.Description)
-				So(actualResult[1].Image, ShouldEqual, testPost3.Image)
-				So(actualResult[1].IsPrivate, ShouldEqual, testPost3.IsPrivate)
-				So(actualResult[1].WhoLikesUserIDs, ShouldEqual, testPost3.WhoLikesUserIDs)
-				So(actualResult[1].User, ShouldResemble, &registeredUser2)
+				So(actualResult[1].ID, ShouldEqual, testPost5.ID)
+				So(actualResult[1].UserID, ShouldEqual, registeredUser1.ID)
+				So(actualResult[1].Description, ShouldEqual, testPost5.Description)
+				So(actualResult[1].Image, ShouldEqual, testPost5.Image)
+				So(actualResult[1].IsPrivate, ShouldEqual, testPost5.IsPrivate)
+				So(actualResult[1].WhoLikesUserIDs, ShouldEqual, testPost5.WhoLikesUserIDs)
+				So(actualResult[1].User, ShouldResemble, &registeredUser1)
 				So(actualResult[1].IsPrivate, ShouldBeFalse)
-				So(actualResult[1].CreatedAt, ShouldEqual, testPost3.CreatedAt)
-				So(actualResult[1].UpdatedAt, ShouldEqual, testPost3.UpdatedAt)
+				So(actualResult[1].CreatedAt, ShouldEqual, testPost5.CreatedAt)
+				So(actualResult[1].UpdatedAt, ShouldEqual, testPost5.UpdatedAt)
 
 				So(actualResult[2].ID, ShouldNotBeNil)
-				So(actualResult[2].ID, ShouldEqual, testPost1.ID)
+				So(actualResult[2].ID, ShouldEqual, testPost3.ID)
 				So(actualResult[2].UserID, ShouldEqual, registeredUser2.ID)
-				So(actualResult[2].Description, ShouldEqual, testPost1.Description)
-				So(actualResult[2].Image, ShouldEqual, testPost1.Image)
-				So(actualResult[2].IsPrivate, ShouldEqual, testPost1.IsPrivate)
-				So(actualResult[2].WhoLikesUserIDs, ShouldEqual, testPost1.WhoLikesUserIDs)
+				So(actualResult[2].Description, ShouldEqual, testPost3.Description)
+				So(actualResult[2].Image, ShouldEqual, testPost3.Image)
+				So(actualResult[2].IsPrivate, ShouldEqual, testPost3.IsPrivate)
+				So(actualResult[2].WhoLikesUserIDs, ShouldEqual, testPost3.WhoLikesUserIDs)
 				So(actualResult[2].User, ShouldResemble, &registeredUser2)
 				So(actualResult[2].IsPrivate, ShouldBeFalse)
-				So(actualResult[2].CreatedAt, ShouldEqual, testPost1.CreatedAt)
-				So(actualResult[2].UpdatedAt, ShouldEqual, testPost1.UpdatedAt)
+				So(actualResult[2].CreatedAt, ShouldEqual, testPost3.CreatedAt)
+				So(actualResult[2].UpdatedAt, ShouldEqual, testPost3.UpdatedAt)
+
+				So(actualResult[3].ID, ShouldNotBeNil)
+				So(actualResult[3].ID, ShouldEqual, testPost1.ID)
+				So(actualResult[3].UserID, ShouldEqual, registeredUser2.ID)
+				So(actualResult[3].Description, ShouldEqual, testPost1.Description)
+				So(actualResult[3].Image, ShouldEqual, testPost1.Image)
+				So(actualResult[3].IsPrivate, ShouldEqual, testPost1.IsPrivate)
+				So(actualResult[3].WhoLikesUserIDs, ShouldEqual, testPost1.WhoLikesUserIDs)
+				So(actualResult[3].User, ShouldResemble, &registeredUser2)
+				So(actualResult[3].IsPrivate, ShouldBeFalse)
+				So(actualResult[3].CreatedAt, ShouldEqual, testPost1.CreatedAt)
+				So(actualResult[3].UpdatedAt, ShouldEqual, testPost1.UpdatedAt)
 			})
 		})
 	})
