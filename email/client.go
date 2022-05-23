@@ -6,7 +6,7 @@ import (
 	gomail "gopkg.in/mail.v2"
 )
 
-const mail = "sociumsocialmedia@gmail.com"
+const mail = "sociumsocialmedia@yandex.com"
 
 type Client interface {
 	SendMail(registeredUser, message string) error
@@ -20,7 +20,7 @@ func SendMail(registeredUser, subject, message string) error {
 	m.SetHeader("Subject", subject)
 
 	m.SetBody("text/plain", message)
-	d := gomail.NewDialer("smtp.gmail.com", 587, "sociumsocialmedia@gmail.com", "sociumtestpassword")
+	d := gomail.NewDialer("smtp.yandex.com", 465, "sociumsocialmedia@yandex.com", "qsbtjfwilzjquink")
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	err := d.DialAndSend(m)
