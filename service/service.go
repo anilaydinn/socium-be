@@ -181,12 +181,12 @@ func (service *Service) CreatePost(postDTO model.PostDTO) (*model.Post, error) {
 	return service.repository.CreatePost(post)
 }
 
-func (service *Service) GetPosts(userID string, isHomePage bool, getFriendPostsDTO model.GetFriendPostsDTO) ([]model.Post, error) {
+func (service *Service) GetPosts(userID string, isHomePage bool, friendIDList []string) ([]model.Post, error) {
 	if isHomePage {
-		getFriendPostsDTO.FriendIDs = append(getFriendPostsDTO.FriendIDs, userID)
+		friendIDList = append(friendIDList, userID)
 	}
 
-	posts, err := service.repository.GetPosts(userID, isHomePage, getFriendPostsDTO.FriendIDs)
+	posts, err := service.repository.GetPosts(userID, isHomePage, friendIDList)
 	if err != nil {
 		return nil, err
 	}

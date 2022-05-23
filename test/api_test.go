@@ -664,13 +664,7 @@ func TestGetAllPosts(t *testing.T) {
 		Convey("When user send get posts request", func() {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
 
-			getFriendPostsDTO := model.GetFriendPostsDTO{
-				FriendIDs: []string{"2dbbds32"},
-			}
-			reqBody, err := json.Marshal(getFriendPostsDTO)
-			So(err, ShouldBeNil)
-
-			req, err := http.NewRequest(http.MethodGet, "/user/posts?userId=3c0bbdae&homepage=true", bytes.NewReader(reqBody))
+			req, err := http.NewRequest(http.MethodGet, "/user/posts?userId=3c0bbdae&homepage=true&friendIdList=2dbbds32", nil)
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Add("Authorization", bearerToken)
 

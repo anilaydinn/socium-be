@@ -108,6 +108,12 @@ type GetFriendPostsDTO struct {
 	FriendIDs []string `json:"friendIds"`
 }
 
+type GetPostsQuery struct {
+	UserID       string   `query:"userId"`
+	Homepage     string   `query:"homepage"`
+	FriendIDList []string `query:"friendIdList"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }
