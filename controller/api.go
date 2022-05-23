@@ -190,10 +190,17 @@ func (api *API) CreatePostHandler(c *fiber.Ctx) error {
 
 func (api *API) GetPostsHandler(c *fiber.Ctx) error {
 	userID := c.Query("userId")
+	homepageString := c.Query("homepage")
+	var isHomepage bool
+	if homepageString == "true" {
+		isHomepage = true
+	} else {
+		isHomepage = false
+	}
 	getFriendPostsDTO := model.GetFriendPostsDTO{}
 	_ = c.BodyParser(&getFriendPostsDTO)
 
-	posts, err := api.service.GetPosts(userID, getFriendPostsDTO)
+	posts, err := api.service.GetPosts(userID, isHomepage, getFriendPostsDTO)
 
 	switch err {
 	case nil:

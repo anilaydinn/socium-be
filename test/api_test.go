@@ -648,8 +648,8 @@ func TestGetAllPosts(t *testing.T) {
 			ID:              utils.GenerateUUID(8),
 			UserID:          registeredUser1.ID,
 			User:            &registeredUser1,
-			Description:     "Test Description 4",
-			Image:           "zcxçömzcxözcxzzçcmzö 4",
+			Description:     "Test Description 5",
+			Image:           "zcxçömzcxözcxzzçcmzö 5",
 			IsPrivate:       false,
 			WhoLikesUserIDs: nil,
 			CreatedAt:       time.Now().UTC().Add(-2 * time.Minute).Round(time.Second),
@@ -665,13 +665,12 @@ func TestGetAllPosts(t *testing.T) {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
 
 			getFriendPostsDTO := model.GetFriendPostsDTO{
-				UserID:    registeredUser1.ID,
 				FriendIDs: []string{"2dbbds32"},
 			}
 			reqBody, err := json.Marshal(getFriendPostsDTO)
 			So(err, ShouldBeNil)
 
-			req, err := http.NewRequest(http.MethodGet, "/user/posts", bytes.NewReader(reqBody))
+			req, err := http.NewRequest(http.MethodGet, "/user/posts?userId=3c0bbdae&homepage=true", bytes.NewReader(reqBody))
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Add("Authorization", bearerToken)
 
