@@ -5,6 +5,7 @@ import (
 	"github.com/anilaydinn/socium-be/model"
 	"github.com/anilaydinn/socium-be/service"
 	"github.com/gofiber/fiber/v2"
+	"strings"
 )
 
 type API struct {
@@ -28,6 +29,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/user/users/:userID/friendRequests/:targetID", api.AcceptOrDeclineUserFriendRequestHandler)
 	app.Get("/user/users/:userID/friends", api.GetUserFriendsHandler)
 	app.Post("/api/contacts", api.CreateContactHandler)
+	app.Get("/user/users", api.GetUsersWithFilterHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -367,6 +369,27 @@ func (api *API) CreateContactHandler(c *fiber.Ctx) error {
 	case nil:
 		c.Status(fiber.StatusCreated)
 		c.JSON(contact)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
+
+func (api *API) GetUsersWithFilterHandler(c *fiber.Ctx) error {
+	filter := c.Query("filter")
+	var filterArr []string
+	if strings.Contains(filter, " ") {
+		filterArr = strings.Split(filter, " ")
+	} else {
+		filterArr = append(filterArr, filter)
+	}
+
+	users, err := api.service.GetUsersWithFilter(filterArr)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(users)
 	default:
 		c.Status(fiber.StatusInternalServerError)
 	}

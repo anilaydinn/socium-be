@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"time"
 
@@ -421,6 +422,36 @@ func (repository *Repository) GetContact(contactID string) (*model.Contact, erro
 	contact := convertContactEntityToContactModel(contactEntity)
 
 	return &contact, nil
+}
+
+func (repository *Repository) GetUsersWithFilter(filterArr []string) ([]model.User, error) {
+	collection := repository.MongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var filter bson.D
+	if len(filterArr) > 1 {
+		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}, {"surname", primitive.Regex{Pattern: filterArr[1], Options: "i"}}}
+	} else if len(filterArr) == 1 {
+		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}}
+	}
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []model.User
+	for cur.Next(ctx) {
+		userEntity := UserEntity{}
+		err := cur.Decode(&userEntity)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, convertUserEntityToUserModel(userEntity))
+	}
+
+	return users, nil
 }
 
 func convertUserModelToUserEntity(user model.User) UserEntity {

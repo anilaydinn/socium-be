@@ -389,3 +389,11 @@ func (service *Service) CreateContact(contactDTO model.ContactDTO) (*model.Conta
 	}
 	return newContact, nil
 }
+
+func (service *Service) GetUsersWithFilter(filterArr []string) ([]model.User, error) {
+	users, err := service.repository.GetUsersWithFilter(filterArr)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
