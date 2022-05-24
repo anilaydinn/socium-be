@@ -29,7 +29,7 @@ func (api *API) SetupApp(app *fiber.App) {
 	app.Post("/user/users/:userID/friendRequests/:targetID", api.AcceptOrDeclineUserFriendRequestHandler)
 	app.Get("/user/users/:userID/friends", api.GetUserFriendsHandler)
 	app.Post("/api/contacts", api.CreateContactHandler)
-	app.Get("/user/users", api.GetUsersWithFilterHandler)
+	app.Get("/api/users", api.GetUsersWithFilterHandler)
 }
 
 func NewAPI(service *service.Service) API {
@@ -377,6 +377,13 @@ func (api *API) CreateContactHandler(c *fiber.Ctx) error {
 
 func (api *API) GetUsersWithFilterHandler(c *fiber.Ctx) error {
 	filter := c.Query("filter")
+
+	if len(filter) == 0 {
+		c.Status(fiber.StatusOK)
+		c.JSON(nil)
+		return nil
+	}
+
 	var filterArr []string
 	if strings.Contains(filter, " ") {
 		filterArr = strings.Split(filter, " ")
