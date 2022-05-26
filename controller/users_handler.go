@@ -256,7 +256,15 @@ func (h *Handler) GetUsersWithFilterHandler(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetAllUsersHandler(c *fiber.Ctx) error {
-	users, err := h.service.GetAllUsers()
+	filter := c.Query("filter")
+	var filterArr []string
+	if strings.Contains(filter, " ") {
+		filterArr = strings.Split(filter, " ")
+	} else {
+		filterArr = append(filterArr, filter)
+	}
+
+	users, err := h.service.GetAllUsers(filterArr)
 	switch err {
 	case nil:
 		c.Status(fiber.StatusOK)

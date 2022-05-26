@@ -165,12 +165,17 @@ func (repository *Repository) GetUsersWithFilter(filterArr []string) ([]model.Us
 	return users, nil
 }
 
-func (repository *Repository) GetAllUsers() ([]model.User, error) {
+func (repository *Repository) GetAllUsers(filterArr []string) ([]model.User, error) {
 	collection := repository.MongoClient.Database("socium").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	filter := bson.M{}
+	var filter bson.D
+	if len(filterArr) > 1 {
+		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}, {"surname", primitive.Regex{Pattern: filterArr[1], Options: "i"}}}
+	} else if len(filterArr) == 1 {
+		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}}
+	}
 
 	cur, err := collection.Find(ctx, filter)
 	if err != nil {
