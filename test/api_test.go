@@ -1539,9 +1539,11 @@ func TestSearchUser(t *testing.T) {
 		testRepository.RegisterUser(registeredUser3)
 
 		Convey("When user send search user request with name query", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
 
-			req, err := http.NewRequest(http.MethodGet, "/api/users?filter=Ahmet", nil)
+			req, err := http.NewRequest(http.MethodGet, "/user/users?filter=Ahmet", nil)
 			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
 
 			res, err := app.Test(req, 30000)
 			So(err, ShouldBeNil)
