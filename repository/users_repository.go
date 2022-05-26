@@ -164,3 +164,28 @@ func (repository *Repository) GetUsersWithFilter(filterArr []string) ([]model.Us
 
 	return users, nil
 }
+
+func (repository *Repository) GetAllUsers() ([]model.User, error) {
+	collection := repository.MongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{}
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []model.User
+	for cur.Next(ctx) {
+		userEntity := UserEntity{}
+		err := cur.Decode(&userEntity)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, convertUserEntityToUserModel(userEntity))
+	}
+
+	return users, nil
+}

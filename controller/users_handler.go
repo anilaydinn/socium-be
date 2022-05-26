@@ -254,3 +254,15 @@ func (h *Handler) GetUsersWithFilterHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) GetAllUsersHandler(c *fiber.Ctx) error {
+	users, err := h.service.GetAllUsers()
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(users)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}

@@ -254,3 +254,11 @@ func (service *Service) GetUsersWithFilter(filterArr []string) ([]model.User, er
 	}
 	return users, nil
 }
+
+func (service *Service) GetAllUsers() ([]model.User, error) {
+	users, err := service.repository.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}

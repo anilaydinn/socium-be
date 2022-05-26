@@ -33,4 +33,5 @@ func (h *Handler) SetupApp(app *fiber.App) {
 	app.Get("/user/users/:userID/friends", h.GetUserFriendsHandler)
 	app.Post("/api/contacts", h.CreateContactHandler)
 	app.Get("/user/users", h.GetUsersWithFilterHandler)
+	app.Get("/admin/users", h.GetAllUsersHandler)
 }

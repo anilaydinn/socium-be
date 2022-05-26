@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/fiber/v2 v2.32.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/smartystreets/goconvey v1.7.2
@@ -12,13 +11,7 @@ require (
 	gopkg.in/mail.v2 v2.3.1
 )
 
-require (
-	github.com/gofiber/utils v0.0.10 // indirect
-	github.com/gorilla/schema v1.1.0 // indirect
-	github.com/mattn/go-colorable v0.1.7 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-)
+require gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect

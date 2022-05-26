@@ -948,3 +948,80 @@ func TestSearchUser(t *testing.T) {
 		})
 	})
 }
+
+func TestAdminGetAllUsers(t *testing.T) {
+	Convey("Given admin user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser1 := model.User{
+			ID:                   "3c0bbdae",
+			Name:                 "James",
+			Surname:              "Bond",
+			Email:                "test@gmail.com",
+			Password:             "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			FriendRequestUserIDs: []string{},
+			FriendIDs:            []string{"123123"},
+			UserType:             "admin",
+			IsActivated:          true,
+		}
+
+		registeredUser2 := model.User{
+			ID:          "123123",
+			Name:        "Mehmet",
+			Surname:     "Bond",
+			Email:       "test1@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		registeredUser3 := model.User{
+			ID:          "321321",
+			Name:        "Ahmet",
+			Surname:     "Bond",
+			Email:       "test2@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		testRepository.RegisterUser(registeredUser1)
+		testRepository.RegisterUser(registeredUser2)
+		testRepository.RegisterUser(registeredUser3)
+
+		Convey("When admin send get all users request", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwiaXNzIjoiM2MwYmJkYWUifQ.aYf3WQryPbYoexgG18Q9iWYbnLtnH2ueE_rgTFdqBx4"
+
+			req, err := http.NewRequest(http.MethodGet, "/admin/users", nil)
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 200", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
+			})
+
+			Convey("Then all users should return", func() {
+				actualResult := []model.User{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult, ShouldHaveLength, 3)
+				So(actualResult[0].ID, ShouldEqual, registeredUser1.ID)
+				So(actualResult[0].Name, ShouldEqual, registeredUser1.Name)
+				So(actualResult[0].Surname, ShouldEqual, registeredUser1.Surname)
+				So(actualResult[0].Email, ShouldEqual, registeredUser1.Email)
+				So(actualResult[0].Password, ShouldEqual, registeredUser1.Password)
+				So(actualResult[0].UserType, ShouldEqual, registeredUser1.UserType)
+				So(actualResult[0].IsActivated, ShouldBeTrue)
+			})
+		})
+	})
+}
