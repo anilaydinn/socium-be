@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
+	"math"
 	"os"
 	"time"
 )
@@ -255,10 +256,20 @@ func (service *Service) GetUsersWithFilter(filterArr []string) ([]model.User, er
 	return users, nil
 }
 
-func (service *Service) GetAllUsers(filterArr []string) ([]model.User, error) {
-	users, err := service.repository.GetAllUsers(filterArr)
+func (service *Service) GetAllUsers(pageNumber, size int, filterArr []string) (*model.UsersPageableResponse, error) {
+	users, totalElements, err := service.repository.GetAllUsers(pageNumber, size, filterArr)
 	if err != nil {
 		return nil, err
 	}
-	return users, nil
+	page := model.Page{
+		Number:        pageNumber,
+		Size:          size,
+		TotalElements: totalElements,
+		TotalPages:    int(math.Ceil(float64(totalElements) / float64(size))),
+	}
+
+	return &model.UsersPageableResponse{
+		Users: users,
+		Page:  page,
+	}, nil
 }

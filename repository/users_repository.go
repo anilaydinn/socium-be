@@ -6,6 +6,7 @@ import (
 	"github.com/anilaydinn/socium-be/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -165,10 +166,16 @@ func (repository *Repository) GetUsersWithFilter(filterArr []string) ([]model.Us
 	return users, nil
 }
 
-func (repository *Repository) GetAllUsers(filterArr []string) ([]model.User, error) {
+func (repository *Repository) GetAllUsers(page, size int, filterArr []string) ([]model.User, int, error) {
 	collection := repository.MongoClient.Database("socium").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	options := options.Find()
+	if size != 0 {
+		options.SetSkip(int64(page * size))
+		options.SetLimit(int64(size))
+	}
 
 	var filter bson.D
 	if len(filterArr) > 1 {
@@ -177,9 +184,9 @@ func (repository *Repository) GetAllUsers(filterArr []string) ([]model.User, err
 		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}}
 	}
 
-	cur, err := collection.Find(ctx, filter)
+	cur, err := collection.Find(ctx, filter, options)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var users []model.User
@@ -187,10 +194,15 @@ func (repository *Repository) GetAllUsers(filterArr []string) ([]model.User, err
 		userEntity := UserEntity{}
 		err := cur.Decode(&userEntity)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		users = append(users, convertUserEntityToUserModel(userEntity))
 	}
 
-	return users, nil
+	totalElements, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return users, int(totalElements), nil
 }

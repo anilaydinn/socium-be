@@ -989,14 +989,24 @@ func TestAdminGetAllUsers(t *testing.T) {
 			UserType:    "user",
 			IsActivated: true,
 		}
+		registeredUser4 := model.User{
+			ID:          "32132131",
+			Name:        "Sinan",
+			Surname:     "Bond",
+			Email:       "test3@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
 		testRepository.RegisterUser(registeredUser1)
 		testRepository.RegisterUser(registeredUser2)
 		testRepository.RegisterUser(registeredUser3)
+		testRepository.RegisterUser(registeredUser4)
 
 		Convey("When admin send get all users request", func() {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwiaXNzIjoiM2MwYmJkYWUifQ.aYf3WQryPbYoexgG18Q9iWYbnLtnH2ueE_rgTFdqBx4"
 
-			req, err := http.NewRequest(http.MethodGet, "/admin/users", nil)
+			req, err := http.NewRequest(http.MethodGet, "/admin/users?page=0&size=2", nil)
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Add("Authorization", bearerToken)
 
@@ -1008,35 +1018,20 @@ func TestAdminGetAllUsers(t *testing.T) {
 			})
 
 			Convey("Then all users should return", func() {
-				actualResult := []model.User{}
+				actualResult := model.UsersPageableResponse{}
 				httpResponseBody, _ := ioutil.ReadAll(res.Body)
 				err := json.Unmarshal(httpResponseBody, &actualResult)
 				So(err, ShouldBeNil)
 
-				So(actualResult, ShouldHaveLength, 3)
-				So(actualResult[0].ID, ShouldEqual, registeredUser1.ID)
-				So(actualResult[0].Name, ShouldEqual, registeredUser1.Name)
-				So(actualResult[0].Surname, ShouldEqual, registeredUser1.Surname)
-				So(actualResult[0].Email, ShouldEqual, registeredUser1.Email)
-				So(actualResult[0].Password, ShouldEqual, registeredUser1.Password)
-				So(actualResult[0].UserType, ShouldEqual, registeredUser1.UserType)
-				So(actualResult[0].IsActivated, ShouldBeTrue)
+				So(actualResult.Users, ShouldNotBeNil)
+				So(actualResult.Users, ShouldHaveLength, 2)
+				So(actualResult.Users[0].ID, ShouldEqual, registeredUser1.ID)
+				So(actualResult.Users[1].ID, ShouldEqual, registeredUser2.ID)
+				So(actualResult.Page.TotalPages, ShouldEqual, 2)
+				So(actualResult.Page.Size, ShouldEqual, 2)
+				So(actualResult.Page.Number, ShouldEqual, 0)
+				So(actualResult.Page.TotalElements, ShouldEqual, 4)
 
-				So(actualResult[1].ID, ShouldEqual, registeredUser2.ID)
-				So(actualResult[1].Name, ShouldEqual, registeredUser2.Name)
-				So(actualResult[1].Surname, ShouldEqual, registeredUser2.Surname)
-				So(actualResult[1].Email, ShouldEqual, registeredUser2.Email)
-				So(actualResult[1].Password, ShouldEqual, registeredUser2.Password)
-				So(actualResult[1].UserType, ShouldEqual, registeredUser2.UserType)
-				So(actualResult[1].IsActivated, ShouldBeTrue)
-
-				So(actualResult[2].ID, ShouldEqual, registeredUser3.ID)
-				So(actualResult[2].Name, ShouldEqual, registeredUser3.Name)
-				So(actualResult[2].Surname, ShouldEqual, registeredUser3.Surname)
-				So(actualResult[2].Email, ShouldEqual, registeredUser3.Email)
-				So(actualResult[2].Password, ShouldEqual, registeredUser3.Password)
-				So(actualResult[2].UserType, ShouldEqual, registeredUser3.UserType)
-				So(actualResult[2].IsActivated, ShouldBeTrue)
 			})
 		})
 	})
@@ -1101,19 +1096,23 @@ func TestAdminSearchUser(t *testing.T) {
 			})
 
 			Convey("Then searched users should return", func() {
-				actualResult := []model.User{}
+				actualResult := model.UsersPageableResponse{}
 				httpResponseBody, _ := ioutil.ReadAll(res.Body)
 				err := json.Unmarshal(httpResponseBody, &actualResult)
 				So(err, ShouldBeNil)
 
-				So(actualResult, ShouldHaveLength, 1)
-				So(actualResult[0].ID, ShouldEqual, registeredUser3.ID)
-				So(actualResult[0].Name, ShouldEqual, registeredUser3.Name)
-				So(actualResult[0].Surname, ShouldEqual, registeredUser3.Surname)
-				So(actualResult[0].Email, ShouldEqual, registeredUser3.Email)
-				So(actualResult[0].Password, ShouldEqual, registeredUser3.Password)
-				So(actualResult[0].UserType, ShouldEqual, registeredUser3.UserType)
-				So(actualResult[0].IsActivated, ShouldBeTrue)
+				So(actualResult.Users, ShouldHaveLength, 1)
+				So(actualResult.Users[0].ID, ShouldEqual, registeredUser3.ID)
+				So(actualResult.Users[0].Name, ShouldEqual, registeredUser3.Name)
+				So(actualResult.Users[0].Surname, ShouldEqual, registeredUser3.Surname)
+				So(actualResult.Users[0].Email, ShouldEqual, registeredUser3.Email)
+				So(actualResult.Users[0].Password, ShouldEqual, registeredUser3.Password)
+				So(actualResult.Users[0].UserType, ShouldEqual, registeredUser3.UserType)
+				So(actualResult.Users[0].IsActivated, ShouldBeTrue)
+				So(actualResult.Page.TotalPages, ShouldEqual, 1)
+				So(actualResult.Page.Size, ShouldEqual, utils.MaxInt)
+				So(actualResult.Page.Number, ShouldEqual, 0)
+				So(actualResult.Page.TotalElements, ShouldEqual, 1)
 			})
 		})
 	})

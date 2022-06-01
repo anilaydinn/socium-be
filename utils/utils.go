@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const MaxInt = int(^uint(0) >> 1)
+
 func GenerateUUID(length int) string {
 	uuid := uuid.New().String()
 

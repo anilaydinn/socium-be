@@ -3,7 +3,9 @@ package controller
 import (
 	"github.com/anilaydinn/socium-be/errors"
 	"github.com/anilaydinn/socium-be/model"
+	"github.com/anilaydinn/socium-be/utils"
 	"github.com/gofiber/fiber/v2"
+	"strconv"
 	"strings"
 )
 
@@ -264,7 +266,29 @@ func (h *Handler) GetAllUsersHandler(c *fiber.Ctx) error {
 		filterArr = append(filterArr, filter)
 	}
 
-	users, err := h.service.GetAllUsers(filterArr)
+	pageStr := c.Query("page")
+	page := 0
+	if len(pageStr) != 0 {
+		var err error
+		page, err = strconv.Atoi(pageStr)
+		if page < 0 || err != nil {
+			c.Status(fiber.StatusBadRequest)
+			return err
+		}
+	}
+
+	sizeStr := c.Query("size")
+	size := utils.MaxInt
+	if len(sizeStr) != 0 {
+		var err error
+		size, err = strconv.Atoi(sizeStr)
+		if size < 0 || err != nil {
+			c.Status(fiber.StatusBadRequest)
+			return err
+		}
+	}
+
+	users, err := h.service.GetAllUsers(page, size, filterArr)
 	switch err {
 	case nil:
 		c.Status(fiber.StatusOK)

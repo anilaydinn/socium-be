@@ -34,6 +34,18 @@ type UserDTO struct {
 	Longitude float64   `json:"longitude"`
 }
 
+type UsersPageableResponse struct {
+	Users []User `json:"users"`
+	Page  Page   `json:"page"`
+}
+
+type Page struct {
+	Number        int `json:"number"`
+	Size          int `json:"size",omitempty`
+	TotalElements int `json:"totalElements",omitempty"`
+	TotalPages    int `json:"totalPages",omitempty"`
+}
+
 type UserCredentialsDTO struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
