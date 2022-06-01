@@ -298,3 +298,23 @@ func (h *Handler) GetAllUsersHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) AdminGetUserHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+
+	if len(userID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	user, err := h.service.AdminGetUser(userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(user)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}

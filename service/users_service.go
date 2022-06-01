@@ -273,3 +273,7 @@ func (service *Service) GetAllUsers(pageNumber, size int, filterArr []string) (*
 		Page:  page,
 	}, nil
 }
+
+func (service *Service) AdminGetUser(userID string) (*model.User, error) {
+	return service.repository.GetUser(userID)
+}
