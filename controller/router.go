@@ -35,4 +35,5 @@ func (h *Handler) SetupApp(app *fiber.App) {
 	app.Get("/user/users", h.GetUsersWithFilterHandler)
 	app.Get("/admin/users", h.GetAllUsersHandler)
 	app.Get("/admin/users/:userID", h.AdminGetUserHandler)
+	app.Get("/admin/users/:userID/posts", h.AdminGetUserPosts)
 }

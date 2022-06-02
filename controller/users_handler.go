@@ -318,3 +318,22 @@ func (h *Handler) AdminGetUserHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) AdminGetUserPosts(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+	if len(userID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	posts, err := h.service.GetUserPosts(userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(posts)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
