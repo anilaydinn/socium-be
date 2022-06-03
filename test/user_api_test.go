@@ -1221,6 +1221,7 @@ func TestAdminGetUserPosts(t *testing.T) {
 		post1 := model.Post{
 			ID:              utils.GenerateUUID(8),
 			UserID:          registeredUser2.ID,
+			User:            &registeredUser2,
 			Description:     "Test Post Description",
 			Image:           "asdşasdöls",
 			IsPrivate:       false,
@@ -1254,6 +1255,7 @@ func TestAdminGetUserPosts(t *testing.T) {
 
 				So(actualResult[0].ID, ShouldNotBeNil)
 				So(actualResult[0].ID, ShouldEqual, post1.ID)
+				So(actualResult[0].User, ShouldResemble, post1.User)
 				So(actualResult[0].UserID, ShouldEqual, registeredUser2.ID)
 				So(actualResult[0].Description, ShouldEqual, post1.Description)
 				So(actualResult[0].UpdatedAt, ShouldEqual, post1.UpdatedAt)

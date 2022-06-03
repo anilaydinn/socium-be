@@ -279,5 +279,21 @@ func (service *Service) AdminGetUser(userID string) (*model.User, error) {
 }
 
 func (service *Service) GetUserPosts(userID string) ([]model.Post, error) {
-	return service.repository.GetUserPosts(userID)
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+
+	posts, err := service.repository.GetUserPosts(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var postResults []model.Post
+	for _, post := range posts {
+		post.User = user
+		postResults = append(postResults, post)
+	}
+
+	return postResults, nil
 }
