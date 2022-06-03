@@ -207,29 +207,15 @@ func (repository *Repository) GetAllUsers(page, size int, filterArr []string) ([
 	return users, int(totalElements), nil
 }
 
-func (repository *Repository) GetUserPosts(userID string) ([]model.Post, error) {
-	collection := repository.MongoClient.Database("socium").Collection("posts")
+func (repository *Repository) GetUserCount() (int, error) {
+	collection := repository.MongoClient.Database("socium").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	options := options.Find()
-	options.SetSort(bson.M{"createdAt": -1})
-
-	filter := bson.M{"userId": userID}
-
-	cur, err := collection.Find(ctx, filter)
+	userCount, err := collection.CountDocuments(ctx, bson.M{})
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
-	var posts []model.Post
-	for cur.Next(ctx) {
-		postEntity := PostEntity{}
-		err := cur.Decode(&postEntity)
-		if err != nil {
-			return nil, err
-		}
-		posts = append(posts, convertPostEntityToPostModel(postEntity))
-	}
-	return posts, nil
+	return int(userCount), nil
 }

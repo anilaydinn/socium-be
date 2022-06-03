@@ -108,3 +108,43 @@ func (repository *Repository) UpdatePost(postID string, post model.Post) (*model
 
 	return repository.GetPost(postID)
 }
+
+func (repository *Repository) GetUserPosts(userID string) ([]model.Post, error) {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	options := options.Find()
+	options.SetSort(bson.M{"createdAt": -1})
+
+	filter := bson.M{"userId": userID}
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []model.Post
+	for cur.Next(ctx) {
+		postEntity := PostEntity{}
+		err := cur.Decode(&postEntity)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, convertPostEntityToPostModel(postEntity))
+	}
+	return posts, nil
+}
+
+func (repository *Repository) GetPostCount() (int, error) {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	postCount, err := collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(postCount), nil
+}

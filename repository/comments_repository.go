@@ -81,3 +81,16 @@ func (repository *Repository) GetCommentsByIDList(commentIDs []string) ([]model.
 	}
 	return comments, nil
 }
+
+func (repository *Repository) GetCommentCount() (int, error) {
+	collection := repository.MongoClient.Database("socium").Collection("comments")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	commentCount, err := collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(commentCount), nil
+}
