@@ -148,3 +148,18 @@ func (repository *Repository) GetPostCount() (int, error) {
 
 	return int(postCount), nil
 }
+
+func (repository *Repository) DeleteUserPost(postID, userID string) error {
+	collection := repository.MongoClient.Database("socium").Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": postID, "userId": userID}
+
+	_, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

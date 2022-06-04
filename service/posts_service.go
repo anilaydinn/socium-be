@@ -122,3 +122,7 @@ func (service *Service) AddPostComment(postID string, commentDTO model.CommentDT
 
 	return service.GetPost(postID)
 }
+
+func (service *Service) DeleteAdminUserPost(postID, userID string) error {
+	return service.repository.DeleteUserPost(postID, userID)
+}

@@ -635,3 +635,75 @@ func TestAddCommentToPost(t *testing.T) {
 		})
 	})
 }
+
+func TestAdminDeleteUserPost(t *testing.T) {
+	Convey("Given admin, registered user and post data", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser1 := model.User{
+			ID:                   "3c0bbdae",
+			Name:                 "James",
+			Surname:              "Bond",
+			Email:                "test@gmail.com",
+			Password:             "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			FriendRequestUserIDs: []string{},
+			FriendIDs:            []string{"123123"},
+			UserType:             "admin",
+			IsActivated:          true,
+		}
+
+		registeredUser2 := model.User{
+			ID:          "123123",
+			Name:        "Mehmet",
+			Surname:     "Bond",
+			Email:       "test1@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		testRepository.RegisterUser(registeredUser1)
+		testRepository.RegisterUser(registeredUser2)
+
+		post1 := model.Post{
+			ID:              utils.GenerateUUID(8),
+			UserID:          registeredUser2.ID,
+			User:            &registeredUser2,
+			Description:     "Test Post Description",
+			Image:           "asdşasdöls",
+			IsPrivate:       false,
+			WhoLikesUserIDs: nil,
+			CommentIDs:      nil,
+			Comments:        nil,
+			CreatedAt:       time.Now().UTC().Round(time.Minute),
+			UpdatedAt:       time.Now().UTC().Round(time.Minute),
+		}
+		testRepository.CreatePost(post1)
+
+		Convey("When admin user send delete user post request with id params", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6ImFkbWluIiwiaXNzIjoiM2MwYmJkYWUifQ.aYf3WQryPbYoexgG18Q9iWYbnLtnH2ueE_rgTFdqBx4"
+
+			req, err := http.NewRequest(http.MethodDelete, "/admin/users/"+registeredUser2.ID+"/posts/"+post1.ID, nil)
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 204", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusNoContent)
+			})
+
+			Convey("Then user post should deleted", func() {
+				post, err := testRepository.GetPost(post1.ID)
+				So(post, ShouldBeNil)
+				So(err, ShouldNotBeNil)
+			})
+		})
+	})
+}

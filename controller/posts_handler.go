@@ -95,3 +95,22 @@ func (h *Handler) AddPostCommentHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) DeleteAdminUserPostHandler(c *fiber.Ctx) error {
+	postID := c.Params("postID")
+	userID := c.Params("userID")
+	if len(postID) == 0 || len(userID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	err := h.service.DeleteAdminUserPost(postID, userID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusNoContent)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
