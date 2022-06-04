@@ -38,3 +38,22 @@ func (h *Handler) AdminGetAllContactsHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) AdminDeleteContactHandler(c *fiber.Ctx) error {
+	contactID := c.Params("contactID")
+	if len(contactID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	err := h.service.DeleteContact(contactID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusNoContent)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+
+	}
+	return nil
+}

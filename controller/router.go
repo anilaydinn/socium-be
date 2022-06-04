@@ -39,4 +39,5 @@ func (h *Handler) SetupApp(app *fiber.App) {
 	app.Get("/admin/dashboard", h.GetAdminDashboard)
 	app.Delete("/admin/users/:userID/posts/:postID", h.DeleteAdminUserPostHandler)
 	app.Get("/admin/contacts", h.AdminGetAllContactsHandler)
+	app.Delete("/admin/contacts/:contactID", h.AdminDeleteContactHandler)
 }

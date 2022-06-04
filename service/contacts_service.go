@@ -24,3 +24,7 @@ func (service *Service) CreateContact(contactDTO model.ContactDTO) (*model.Conta
 func (service *Service) GetAllContacts() ([]model.Contact, error) {
 	return service.repository.GetAllContacts()
 }
+
+func (service *Service) DeleteContact(contactID string) error {
+	return service.repository.DeleteContact(contactID)
+}

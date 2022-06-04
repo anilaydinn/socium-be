@@ -77,3 +77,18 @@ func (repository *Repository) GetAllContacts() ([]model.Contact, error) {
 
 	return contacts, nil
 }
+
+func (repository *Repository) DeleteContact(contactID string) error {
+	collection := repository.MongoClient.Database("socium").Collection("contacts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"id": contactID}
+
+	_, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
