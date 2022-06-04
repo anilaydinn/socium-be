@@ -52,3 +52,28 @@ func (repository *Repository) GetContact(contactID string) (*model.Contact, erro
 
 	return &contact, nil
 }
+
+func (repository *Repository) GetAllContacts() ([]model.Contact, error) {
+	collection := repository.MongoClient.Database("socium").Collection("contacts")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{}
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var contacts []model.Contact
+	for cur.Next(ctx) {
+		contactEntity := ContactEntity{}
+		err := cur.Decode(&contactEntity)
+		if err != nil {
+			return nil, err
+		}
+		contacts = append(contacts, convertContactEntityToContactModel(contactEntity))
+	}
+
+	return contacts, nil
+}

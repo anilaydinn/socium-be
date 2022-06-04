@@ -20,3 +20,7 @@ func (service *Service) CreateContact(contactDTO model.ContactDTO) (*model.Conta
 	}
 	return newContact, nil
 }
+
+func (service *Service) GetAllContacts() ([]model.Contact, error) {
+	return service.repository.GetAllContacts()
+}

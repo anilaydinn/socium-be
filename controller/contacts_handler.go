@@ -24,3 +24,17 @@ func (h *Handler) CreateContactHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) AdminGetAllContactsHandler(c *fiber.Ctx) error {
+	contacts, err := h.service.GetAllContacts()
+
+	switch err {
+	case nil:
+		c.JSON(contacts)
+		c.Status(fiber.StatusOK)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+
+	}
+	return nil
+}
