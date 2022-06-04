@@ -219,3 +219,18 @@ func (repository *Repository) GetUserCount() (int, error) {
 
 	return int(userCount), nil
 }
+
+func (repository *Repository) GetActivatedUserCount() (int, error) {
+	collection := repository.MongoClient.Database("socium").Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"isActivated": true}
+
+	activatedUserCount, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(activatedUserCount), nil
+}

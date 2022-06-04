@@ -1,7 +1,8 @@
 package model
 
 type DashboardInformation struct {
-	UserCount    int `json:"userCount"`
-	PostCount    int `json:"postCount"`
-	CommentCount int `json:"commentCount"`
+	UserCount          int `json:"userCount"`
+	PostCount          int `json:"postCount"`
+	CommentCount       int `json:"commentCount"`
+	ActivatedUserCount int `json:"activatedUserCount"`
 }

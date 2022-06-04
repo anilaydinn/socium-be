@@ -14,10 +14,19 @@ func (service *Service) GetAdminDashboard() (*model.DashboardInformation, error)
 	}
 
 	commentCount, err := service.repository.GetCommentCount()
+	if err != nil {
+		return nil, err
+	}
+
+	activatedUserCount, err := service.repository.GetActivatedUserCount()
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.DashboardInformation{
-		UserCount:    userCount,
-		PostCount:    postCount,
-		CommentCount: commentCount,
+		UserCount:          userCount,
+		PostCount:          postCount,
+		CommentCount:       commentCount,
+		ActivatedUserCount: activatedUserCount,
 	}, nil
 }
