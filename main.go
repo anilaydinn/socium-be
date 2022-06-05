@@ -25,7 +25,9 @@ func main() {
 
 	api.SetupApp(app)
 
-	if err := app.Listen(":8080"); err != nil {
+	port := utils.SetPort()
+
+	if err := app.Listen(":" + port); err != nil {
 		fmt.Println(err)
 		return
 	}

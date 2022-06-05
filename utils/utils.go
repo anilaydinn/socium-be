@@ -62,3 +62,13 @@ func linearSearch(s []string, id string) int {
 	}
 	return -1
 }
+
+func SetPort() string {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		return "8080"
+	}
+
+	return port
+}
