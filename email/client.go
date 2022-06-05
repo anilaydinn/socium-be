@@ -21,7 +21,15 @@ func SendMail(registeredUser, subject, message string) error {
 	m.SetHeader("Subject", subject)
 
 	m.SetBody("text/plain", message)
-	d := gomail.NewDialer("smtp.yandex.com", 465, "sociumsocialmedia@yandex.com", os.Getenv("YANDEX_PASSWORD"))
+
+	var password string
+	if len(os.Getenv("YANDEX_PASSWORD")) == 0 {
+		password = "cnxfedsnjsdrhdwl"
+	} else {
+		password = os.Getenv("YANDEX_PASSWORD")
+	}
+
+	d := gomail.NewDialer("smtp.yandex.com", 465, "sociumsocialmedia@yandex.com", password)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	err := d.DialAndSend(m)
