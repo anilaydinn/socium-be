@@ -46,7 +46,7 @@ func (service *Service) RegisterUser(userDTO model.UserDTO) (*model.User, error)
 		return nil, err
 	}
 
-	err = email.SendMail(newUser.Email, "Complete Registration", "Please click "+os.Getenv("PROD_HOSTNAME")+"/activation/"+user.ID)
+	err = email.SendMail(newUser.Email, "Complete Registration", "Please click "+os.Getenv("REACT_HOSTNAME")+"/activation/"+user.ID)
 	if err != nil {
 		return nil, err
 	}
