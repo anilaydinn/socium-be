@@ -25,7 +25,7 @@ func main() {
 
 	api.SetupApp(app)
 
-	if err := app.Listen(":8080"); err != nil {
+	if err := app.Listen(":80"); err != nil {
 		fmt.Println(err)
 		return
 	}
