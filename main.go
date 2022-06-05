@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/anilaydinn/socium-be/controller"
 	"github.com/anilaydinn/socium-be/middleware"
 	"github.com/anilaydinn/socium-be/repository"
@@ -24,5 +25,8 @@ func main() {
 
 	api.SetupApp(app)
 
-	app.Listen(":8080")
+	if err := app.Listen(":8080"); err != nil {
+		fmt.Println(err)
+		return
+	}
 }
