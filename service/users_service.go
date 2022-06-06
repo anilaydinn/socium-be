@@ -306,7 +306,7 @@ func (service *Service) GetNearUsers(userID string, getNearUsersDTO model.GetNea
 
 	nearUsers := []model.User{}
 	for _, user := range users {
-		if utils.CalculateDistanceKM(user.Latitude, user.Longitude, getNearUsersDTO.Latitude, getNearUsersDTO.Longitude, "K") <= 20 && user.ID != userID {
+		if utils.CalculateDistanceKM(user.Latitude, user.Longitude, getNearUsersDTO.Latitude, getNearUsersDTO.Longitude, "K") <= 20 && user.ID != userID && user.Longitude > 0 && user.Latitude > 0 {
 			nearUsers = append(nearUsers, user)
 		}
 	}
