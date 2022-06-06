@@ -297,3 +297,19 @@ func (service *Service) GetUserPosts(userID string) ([]model.Post, error) {
 
 	return postResults, nil
 }
+
+func (service *Service) GetNearUsers(userID string, getNearUsersDTO model.GetNearUsersDTO) ([]model.User, error) {
+	users, _, err := service.repository.GetAllUsers(0, 0, []string{})
+	if err != nil {
+		return nil, err
+	}
+
+	nearUsers := []model.User{}
+	for _, user := range users {
+		if utils.CalculateDistanceKM(user.Latitude, user.Longitude, getNearUsersDTO.Latitude, getNearUsersDTO.Longitude, "K") <= 20 && user.ID != userID {
+			nearUsers = append(nearUsers, user)
+		}
+	}
+
+	return nearUsers, nil
+}

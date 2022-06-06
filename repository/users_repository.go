@@ -177,11 +177,13 @@ func (repository *Repository) GetAllUsers(page, size int, filterArr []string) ([
 		options.SetLimit(int64(size))
 	}
 
-	var filter bson.D
+	var filter interface{}
 	if len(filterArr) > 1 {
 		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}, {"surname", primitive.Regex{Pattern: filterArr[1], Options: "i"}}}
 	} else if len(filterArr) == 1 {
 		filter = bson.D{{"name", primitive.Regex{Pattern: filterArr[0], Options: "i"}}}
+	} else {
+		filter = bson.M{}
 	}
 
 	cur, err := collection.Find(ctx, filter, options)

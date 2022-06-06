@@ -337,3 +337,27 @@ func (h *Handler) AdminGetUserPosts(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) GetNearUsersHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+	if len(userID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+	getNearUsersDTO := model.GetNearUsersDTO{}
+	err := c.BodyParser(&getNearUsersDTO)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+	}
+	users, err := h.service.GetNearUsers(userID, getNearUsersDTO)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(users)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+
+	}
+	return nil
+}

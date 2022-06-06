@@ -80,6 +80,11 @@ type GetFriendPostsDTO struct {
 	FriendIDs []string `json:"friendIds"`
 }
 
+type GetNearUsersDTO struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
 type Token struct {
 	Token string `json:"token"`
 }
