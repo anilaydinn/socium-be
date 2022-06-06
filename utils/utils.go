@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"math"
 	"os"
 	"strings"
@@ -98,7 +97,6 @@ func CalculateDistanceKM(lat1 float64, lng1 float64, lat2 float64, lng2 float64,
 			dist = dist * 0.8684
 		}
 	}
-	fmt.Println(dist)
 
 	return dist
 }
