@@ -178,7 +178,9 @@ func (service *Service) SendFriendRequest(targetUserID string, friendRequestDTO 
 	if err != nil {
 		return nil, errors.UserNotFound
 	}
-	user.FriendRequestUserIDs = append(user.FriendRequestUserIDs, friendRequestDTO.UserID)
+	if !utils.Contains(user.FriendRequestUserIDs, friendRequestDTO.UserID) {
+		user.FriendRequestUserIDs = append(user.FriendRequestUserIDs, friendRequestDTO.UserID)
+	}
 
 	updatedUser, err := service.repository.UpdateUser(targetUserID, *user)
 	if err != nil {
