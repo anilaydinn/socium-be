@@ -315,3 +315,29 @@ func (service *Service) GetNearUsers(userID string, getNearUsersDTO model.GetNea
 
 	return nearUsers, nil
 }
+
+func (service *Service) DeleteUserFriend(userID, friendID string) (*model.User, error) {
+	user, err := service.repository.GetUser(userID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+
+	friend, err := service.repository.GetUser(friendID)
+	if err != nil {
+		return nil, errors.UserNotFound
+	}
+
+	user.FriendIDs = utils.RemoveElement(user.FriendIDs, friend.ID)
+	updatedUser, err := service.repository.UpdateUser(user.ID, *user)
+	if err != nil {
+		return nil, err
+	}
+
+	friend.FriendIDs = utils.RemoveElement(friend.FriendIDs, user.ID)
+	_, err = service.repository.UpdateUser(friend.ID, *friend)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
+}

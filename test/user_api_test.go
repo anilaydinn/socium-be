@@ -1355,3 +1355,75 @@ func TestGetNearUsers(t *testing.T) {
 		})
 	})
 }
+
+func TestDeleteUserFriend(t *testing.T) {
+	Convey("Given registered user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser1 := model.User{
+			ID:                   "3c0bbdae",
+			Name:                 "James",
+			Surname:              "Bond",
+			Email:                "test@gmail.com",
+			Password:             "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			FriendRequestUserIDs: []string{},
+			FriendIDs:            []string{"123123"},
+			UserType:             "user",
+			IsActivated:          true,
+			Longitude:            26.679363372044076,
+			Latitude:             41.262426815780856,
+		}
+
+		registeredUser2 := model.User{
+			ID:          "123123",
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			FriendIDs:   []string{"3c0bbdae"},
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+			Longitude:   26.653,
+			Latitude:    41.25,
+		}
+		testRepository.RegisterUser(registeredUser1)
+		testRepository.RegisterUser(registeredUser2)
+
+		Convey("When delete user friend request send", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
+
+			req, err := http.NewRequest(http.MethodPatch, "/user/users/"+registeredUser1.ID+"/friends/"+registeredUser2.ID, nil)
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 200", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
+			})
+
+			Convey("Then near user should return", func() {
+				actualResult := model.User{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult.ID, ShouldEqual, registeredUser1.ID)
+				So(actualResult.Name, ShouldEqual, registeredUser1.Name)
+				So(actualResult.Surname, ShouldEqual, registeredUser1.Surname)
+				So(actualResult.Email, ShouldEqual, registeredUser1.Email)
+				So(actualResult.Password, ShouldEqual, registeredUser1.Password)
+				So(actualResult.UserType, ShouldEqual, registeredUser1.UserType)
+				So(actualResult.FriendIDs, ShouldHaveLength, 0)
+				So(actualResult.IsActivated, ShouldBeTrue)
+			})
+		})
+	})
+}

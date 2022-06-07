@@ -361,3 +361,23 @@ func (h *Handler) GetNearUsersHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) DeleteUserFriendHandler(c *fiber.Ctx) error {
+	userID := c.Params("userID")
+	friendID := c.Params("friendID")
+	if len(userID) == 0 || len(friendID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+
+	user, err := h.service.DeleteUserFriend(userID, friendID)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(user)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}

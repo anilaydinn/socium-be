@@ -41,4 +41,5 @@ func (h *Handler) SetupApp(app *fiber.App) {
 	app.Get("/admin/contacts", h.AdminGetAllContactsHandler)
 	app.Delete("/admin/contacts/:contactID", h.AdminDeleteContactHandler)
 	app.Post("/user/users/:userID/near", h.GetNearUsersHandler)
+	app.Patch("/user/users/:userID/friends/:friendID", h.DeleteUserFriendHandler)
 }
