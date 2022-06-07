@@ -1398,7 +1398,7 @@ func TestDeleteUserFriend(t *testing.T) {
 		Convey("When delete user friend request send", func() {
 			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
 
-			req, err := http.NewRequest(http.MethodPatch, "/user/users/"+registeredUser1.ID+"/friends/"+registeredUser2.ID, nil)
+			req, err := http.NewRequest(http.MethodGet, "/user/users/"+registeredUser1.ID+"/friends/"+registeredUser2.ID, nil)
 			req.Header.Add("Content-Type", "application/json")
 			req.Header.Add("Authorization", bearerToken)
 

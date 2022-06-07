@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/anilaydinn/socium-be/model"
 	"github.com/anilaydinn/socium-be/repository"
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +22,7 @@ func NewService(repository repository.Repository) Service {
 }
 
 func (s *Service) VerifyToken(bearerToken, role string) bool {
-
+	fmt.Println(bearerToken)
 	splitToken := strings.Split(strings.Replace(bearerToken, "\"", "", -1), "Bearer ")
 	if len(splitToken) != 2 {
 		return false
