@@ -126,3 +126,16 @@ func (service *Service) AddPostComment(postID string, commentDTO model.CommentDT
 func (service *Service) DeleteAdminUserPost(postID, userID string) error {
 	return service.repository.DeleteUserPost(postID, userID)
 }
+
+func (service *Service) GetWhoLikesPost(postID string, whoLikesUserIDs []string) ([]model.User, error) {
+	post, err := service.repository.GetPost(postID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !(len(post.WhoLikesUserIDs) == len(whoLikesUserIDs)) {
+		return nil, errors.WhoLikesArrayNotEqual
+	}
+
+	return service.repository.GetUsersByIDList(whoLikesUserIDs)
+}

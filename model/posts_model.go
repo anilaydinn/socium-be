@@ -32,3 +32,7 @@ type GetPostsQuery struct {
 	Homepage     string   `query:"homepage"`
 	FriendIDList []string `query:"friendIdList"`
 }
+
+type WhoLikesQuery struct {
+	WhoLikesUserIDs []string `query:"whoLikesUserIds"`
+}

@@ -707,3 +707,77 @@ func TestAdminDeleteUserPost(t *testing.T) {
 		})
 	})
 }
+
+func TestGetWhoLikesPost(t *testing.T) {
+	Convey("Given that register user", t, func() {
+		app := fiber.New()
+		testRepository := GetCleanTestRepository()
+		middleware.SetupMiddleWare(app, *testRepository)
+		service := service.NewService(testRepository)
+		api := controller.NewAPI(&service)
+
+		api.SetupApp(app)
+
+		registeredUser1 := model.User{
+			ID:          "3c0bbdae",
+			Name:        "James",
+			Surname:     "Bond",
+			Email:       "test@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		registeredUser2 := model.User{
+			ID:          "123123",
+			Name:        "Mehmet",
+			Surname:     "Bond",
+			Email:       "test1@gmail.com",
+			Password:    "$2a$10$08qe8bXis2qObLNyEJfzpePCnqSJRyUXIa//ALLJw9l8q5gOTJljq",
+			UserType:    "user",
+			IsActivated: true,
+		}
+		testRepository.RegisterUser(registeredUser1)
+		testRepository.RegisterUser(registeredUser2)
+
+		post1 := model.Post{
+			ID:              utils.GenerateUUID(8),
+			UserID:          utils.GenerateUUID(8),
+			User:            nil,
+			Description:     "Hello",
+			Image:           "adsknasnjkadsnjka",
+			IsPrivate:       false,
+			WhoLikesUserIDs: []string{registeredUser2.ID},
+			CommentIDs:      nil,
+			Comments:        nil,
+			CreatedAt:       time.Time{},
+			UpdatedAt:       time.Time{},
+		}
+		testRepository.CreatePost(post1)
+
+		Convey("When user send get who likes request", func() {
+			bearerToken := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6InVzZXIiLCJpc3MiOiIzYzBiYmRhZSJ9.F_7cDDzm0THldtJLLNunfdXtoKqLKeMK8BdHG9Dxi-s"
+
+			req, err := http.NewRequest(http.MethodGet, "/user/posts/"+post1.ID+"/likes?whoLikesUserIds="+registeredUser2.ID, nil)
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Authorization", bearerToken)
+
+			res, err := app.Test(req, 30000)
+			So(err, ShouldBeNil)
+
+			Convey("Then status code should be 200", func() {
+				So(res.StatusCode, ShouldEqual, fiber.StatusOK)
+			})
+
+			Convey("Then all likes users should return", func() {
+				actualResult := []model.User{}
+				httpResponseBody, _ := ioutil.ReadAll(res.Body)
+				err := json.Unmarshal(httpResponseBody, &actualResult)
+				So(err, ShouldBeNil)
+
+				So(actualResult[0].ID, ShouldEqual, registeredUser2.ID)
+				So(actualResult[0].Name, ShouldEqual, registeredUser2.Name)
+			})
+		})
+
+	})
+}

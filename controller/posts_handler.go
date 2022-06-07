@@ -114,3 +114,29 @@ func (h *Handler) DeleteAdminUserPostHandler(c *fiber.Ctx) error {
 	}
 	return nil
 }
+
+func (h *Handler) GetWholikesPostHandler(c *fiber.Ctx) error {
+	postID := c.Params("postID")
+	if len(postID) == 0 {
+		c.Status(fiber.StatusBadRequest)
+		return nil
+	}
+	q := new(model.WhoLikesQuery)
+
+	if err := c.QueryParser(q); err != nil {
+		return err
+	}
+
+	users, err := h.service.GetWhoLikesPost(postID, q.WhoLikesUserIDs)
+
+	switch err {
+	case nil:
+		c.Status(fiber.StatusOK)
+		c.JSON(users)
+	case errors.WhoLikesArrayNotEqual:
+		c.Status(fiber.StatusBadRequest)
+	default:
+		c.Status(fiber.StatusInternalServerError)
+	}
+	return nil
+}
